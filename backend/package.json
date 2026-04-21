@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "build": "tsc --noEmit false"
+    "build": "tsc"
   },
   "dependencies": {
     "@hono/node-server": "^1.12.0",
