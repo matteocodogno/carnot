@@ -1,18 +1,21 @@
-# arCO₂ — Demo Modulo 1 Privati
+# arCO₂ — Module 1 Private Individuals Demo
 
-Demo funzionante del Modulo 1 (Primo contatto e orientamento iniziale) della piattaforma arCO₂ per TicinoEnergia.
+**Codename: carnot**
 
-## Stack tecnico
+A fully functional demo of Module 1 (Initial Contact & Orientation) of the arCO₂ platform, built by WellD for the TicinoEnergia RFP.
 
-| Layer | Tecnologie |
-|-------|-----------|
+## Tech stack
+
+| Layer | Technologies |
+|---|---|
 | Frontend | React 18 + Vite 5 + TypeScript + React Router v6 |
 | Backend | Node.js + Hono v4 + TypeScript |
-| Dati | In-memory (demo) — pronto per Postgres/SQLite in produzione |
+| Data | In-memory store (demo) — ready to swap for Postgres/SQLite in production |
+| Deploy | Frontend → Vercel · Backend → Railway |
 
-## Avvio rapido
+## Quick start
 
-### 1. Backend (porta 3001)
+### 1. Backend (port 3001)
 
 ```bash
 cd backend
@@ -20,7 +23,7 @@ npm install
 npm run dev
 ```
 
-### 2. Frontend (porta 5173)
+### 2. Frontend (port 5173)
 
 ```bash
 cd frontend
@@ -28,55 +31,69 @@ npm install
 npm run dev
 ```
 
-Apri http://localhost:5173
+Open http://localhost:5173
 
-## Flusso utente dimostrabile
+## User flow
 
 ```
 Landing page
-    ↓  "Scopri i percorsi per il tuo edificio"
-Questionario (6 step)
-    ↓  risponde alle 6 domande
-Anteprima risultati (preview parziale + lock)
-    ↓  "Crea account gratuito"
-Registrazione
-    ↓  account creato, dati questionario collegati
+    ↓  "Discover pathways for your building"
+Questionnaire (6 steps)
+    ↓  user answers 6 questions
+Preview results (top 2 visible · rest locked)
+    ↓  "Create free account"
+Registration
+    ↓  account created, questionnaire data linked
 Dashboard
-    ├── Panoramica (stats, percorso principale, prossimi passi)
-    ├── Dossier edificio (dati + completamento)
-    ├── Percorsi (5 percorsi con dettagli espandibili)
-    ├── Consulente arCO₂ assegnato
-    └── Documenti
+    ├── Overview (stats, top pathway, next steps)
+    ├── Building dossier (data + completion progress)
+    ├── Pathways (5 pathways with expandable details)
+    ├── Assigned arCO₂ consultant
+    └── Documents
 ```
 
 ## API endpoints
 
-| Metodo | Path | Descrizione |
-|--------|------|-------------|
-| GET | /api/health | Health check |
-| POST | /api/questionnaire | Submit questionario → algoritmo percorsi |
-| POST | /api/register | Crea account (con dati questionario) |
-| POST | /api/login | Login utente esistente |
-| GET | /api/dashboard | Dashboard dati (richiede Bearer token) |
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/health` | Health check |
+| POST | `/api/questionnaire` | Submit questionnaire → run pathway scoring algorithm |
+| POST | `/api/register` | Create account (links questionnaire data via tempToken) |
+| POST | `/api/login` | Login for existing users |
+| GET | `/api/dashboard` | Dashboard data (requires Bearer token) |
 
-## Algoritmo di raccomandazione
+## Recommendation algorithm
 
-Il backend implementa un motore di scoring che, basandosi sulle 6 risposte del questionario, calcola uno score per 5 possibili percorsi:
+The backend scores 5 possible pathways based on the 6 questionnaire answers:
 
-1. **Risanamento involucro** (isolamento + infissi)
-2. **Sostituzione riscaldamento** (pompa di calore)
-3. **Fotovoltaico + accumulo**
-4. **Ventilazione meccanica controllata**
-5. **Certificazione energetica CECE**
+1. **Building envelope retrofit** — insulation + windows
+2. **Heating system replacement** — heat pump
+3. **Photovoltaic + storage** — solar panels + battery
+4. **Mechanical ventilation** — controlled ventilation system
+5. **CECE energy certification** — official energy certificate
 
-I percorsi vengono ordinati per score e etichettati come: *Fortemente consigliato*, *Consigliato*, *Da valutare*, *Opzionale*.
+Pathways are ranked by score and labelled: *Strongly recommended*, *Recommended*, *Worth considering*, *Optional*.
 
-## Note per la presentazione
+Estimation functions (`ageFactor`, `fuelFactor`, `classeFactor`) derive savings ranges, CO₂ reductions, and incentive amounts deterministically from the user's actual answers — no randomness, no hardcoded values.
 
-- La demo usa **storage in-memory** — i dati si resettano al riavvio del server
-- Il proxy Vite (`/api → localhost:3001`) evita problemi CORS in sviluppo
-- Il TypeScript compila senza errori su entrambi i progetti
-- 3 consulenti arCO₂ mockati, assegnati round-robin alla registrazione
+## Deployment
+
+See [DEPLOY.md](./DEPLOY.md) for the full step-by-step guide (GitHub → Railway → Vercel).
+
+**Environment variables summary:**
+
+| Service | Variable | Description |
+|---|---|---|
+| Backend (Railway) | `FRONTEND_URL` | Vercel URL, e.g. `https://carnot-demo.vercel.app` |
+| Frontend (Vercel) | `VITE_API_URL` | Railway URL, e.g. `https://carnot-backend.up.railway.app` |
+
+## Demo notes
+
+- The demo uses **in-memory storage** — data resets on server restart (intentional for demo simplicity)
+- The Vite dev proxy (`/api → localhost:3001`) handles CORS in development automatically
+- TypeScript compiles without errors on both projects
+- 3 mock arCO₂ consultants, assigned round-robin at registration
 
 ---
-*Demo sviluppata da WellD per la RFP arCO₂ · TicinoEnergia · Aprile 2026*
+
+*Demo built by WellD for the arCO₂ RFP · TicinoEnergia · April 2026*
