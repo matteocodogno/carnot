@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../App'
 import { DashboardData, Pathway, ProssimoStep } from '../types'
+import { apiUrl } from '../lib/api'
 import './Dashboard.css'
 
 type NavSection = 'panoramica' | 'dossier' | 'percorsi' | 'consulente' | 'documenti'
@@ -27,7 +28,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchDashboard() {
       try {
-        const res = await fetch('/api/dashboard', {
+        const res = await fetch(apiUrl('/api/dashboard'), {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.status === 401) { logout(); navigate('/'); return }

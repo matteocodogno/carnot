@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuestionnaire } from '../App'
 import { QuestionnaireData } from '../types'
+import { apiUrl } from '../lib/api'
 import './Questionnaire.css'
 
 interface Option {
@@ -163,7 +164,7 @@ export default function Questionnaire() {
         obiettivi: Array.isArray(answers.obiettivi) ? answers.obiettivi : [],
       }
 
-      const res = await fetch('/api/questionnaire', {
+      const res = await fetch(apiUrl('/api/questionnaire'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

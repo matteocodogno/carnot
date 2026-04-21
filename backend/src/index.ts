@@ -6,10 +6,17 @@ import { v4 as uuidv4 } from 'uuid'
 const app = new Hono()
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
+// Origini permesse: in produzione si aggiunge FRONTEND_URL via env var
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+]
+
 app.use(
   '*',
   cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    origin: (origin) => (allowedOrigins.includes(origin) ? origin : allowedOrigins[0]),
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -535,8 +542,7 @@ app.get('/api/dashboard', (c) => {
 })
 
 // ─── START ───────────────────────────────────────────────────────────────────
-const port = 3001
-console.log(`\n🌿 arCO₂ Backend API`)
-console.log(`   http://localhost:${port}/api/health\n`)
+// Railway inietta PORT automaticamente; fallback a 3001 in locale
+const port = parseInt(process.env.PORT ?? '3001')
 
 serve({ fetch: app.fetch, port })
