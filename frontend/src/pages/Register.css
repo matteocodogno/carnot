@@ -1,0 +1,177 @@
+/* ─── Register Layout ─────────────────────────────────────────────────────────── */
+.register-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ─── Left Panel ──────────────────────────────────────────────────────────────── */
+.register-left {
+  background: linear-gradient(160deg, var(--color-primary-dark) 0%, var(--color-primary) 60%, var(--color-teal) 100%);
+  padding: var(--space-10) var(--space-12);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.register-left-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+.register-hero-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  margin-bottom: var(--space-5);
+}
+
+.register-hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.65;
+  margin-bottom: var(--space-8);
+  max-width: 380px;
+}
+
+.register-perks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.register-perk {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 15px;
+  color: rgba(255,255,255,0.9);
+}
+
+.perk-icon { font-size: 20px; flex-shrink: 0; }
+
+/* ─── Right Panel ─────────────────────────────────────────────────────────────── */
+.register-right {
+  background: var(--color-bg);
+  padding: var(--space-10) var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.register-form-wrapper {
+  width: 100%;
+  max-width: 440px;
+}
+
+.register-form-header {
+  margin-bottom: var(--space-6);
+}
+
+.register-form-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.register-form-header p {
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.register-questionnaire-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-green-light);
+  border: 1px solid var(--color-green);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-green);
+  margin-bottom: var(--space-5);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.register-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+/* ─── Password ────────────────────────────────────────────────────────────────── */
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.6;
+  padding: 4px;
+}
+
+.password-strength {
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+.password-strength.strong { color: var(--color-green); }
+.password-strength.medium { color: #b45309; }
+.password-strength.weak { color: var(--color-red); }
+
+/* ─── Error ───────────────────────────────────────────────────────────────────── */
+.register-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-red-light);
+  border: 1px solid var(--color-red);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--color-red);
+}
+
+/* ─── Terms ───────────────────────────────────────────────────────────────────── */
+.register-terms {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.register-terms a { color: var(--color-primary); }
+
+.register-login-link {
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-5);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border-light);
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .register-page { grid-template-columns: 1fr; }
+  .register-left { display: none; }
+  .register-right { padding: var(--space-8) var(--space-5); align-items: flex-start; }
+}
