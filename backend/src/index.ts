@@ -545,4 +545,6 @@ app.get('/api/dashboard', (c) => {
 // Railway inietta PORT automaticamente; fallback a 3001 in locale
 const port = parseInt(process.env.PORT ?? '3001')
 
-serve({ fetch: app.fetch, port })
+serve({ fetch: app.fetch, port, hostname: '0.0.0.0' }, (info) => {
+  console.log(`Server running on http://${info.address}:${info.port}`)
+})
