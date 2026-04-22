@@ -6,6 +6,7 @@ import Questionnaire from './pages/Questionnaire'
 import PreviewResults from './pages/PreviewResults'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Pathways from './pages/Pathways'
 
 // ─── Auth Context ─────────────────────────────────────────────────────────────
 interface AuthCtx {
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="/accedi" element={<Login />} />
             <Route path="/questionario" element={<Questionnaire />} />
             <Route path="/anteprima" element={<PreviewResults />} />
+            <Route path="/percorsi" element={<Pathways />} />
             <Route path="/registrati" element={<Register />} />
             <Route
               path="/dashboard"

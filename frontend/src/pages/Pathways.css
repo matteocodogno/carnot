@@ -1,0 +1,503 @@
+/* ─── Layout ─────────────────────────────────────────────────────────────── */
+.pathways-page {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* ─── Nav ────────────────────────────────────────────────────────────────── */
+.pathways-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pathways-nav .nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.pathways-nav .nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0 auto;
+}
+
+.nav-link-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.nav-link-btn:hover {
+  color: var(--color-text);
+}
+
+.nav-link-active {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-teal);
+}
+
+.pathways-nav .nav-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ─── Hero ───────────────────────────────────────────────────────────────── */
+.pathways-hero {
+  background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 60%, #0a2e2a 100%);
+  padding: 80px var(--space-6) var(--space-16);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.pathways-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(20, 184, 166, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.pathways-hero-inner {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.pathways-hero-badge {
+  display: inline-block;
+  background: rgba(20, 184, 166, 0.15);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  color: #5eead4;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 100px;
+  margin-bottom: var(--space-6);
+}
+
+.pathways-hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: var(--space-5);
+  letter-spacing: -0.02em;
+}
+
+.pathways-hero-accent {
+  color: var(--color-teal);
+}
+
+.pathways-hero-sub {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin-bottom: var(--space-8);
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pathways-hero-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pathways-hero-note {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ─── Stats ──────────────────────────────────────────────────────────────── */
+.pathways-stats {
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-10) var(--space-6);
+}
+
+.pathways-stats-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+}
+
+.stat-card {
+  text-align: center;
+  padding: var(--space-4);
+}
+
+.stat-icon {
+  font-size: 1.8rem;
+  margin-bottom: var(--space-2);
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-teal);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: var(--space-1);
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── Cards section ──────────────────────────────────────────────────────── */
+.pathways-cards-section {
+  padding: var(--space-16) var(--space-6);
+  background: var(--color-bg);
+}
+
+.pathways-cards-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pathways-section-header {
+  text-align: center;
+  margin-bottom: var(--space-12);
+}
+
+.pathways-section-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.pathways-section-header p {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+}
+
+.pathways-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+/* ─── Pathway card ───────────────────────────────────────────────────────── */
+.pathway-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.pathway-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.pathway-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.pathway-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.pathway-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 100px;
+}
+
+.pathway-label-green {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.pathway-label-blue {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.pathway-label-yellow {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pathway-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.pathway-subtitle {
+  font-size: 0.82rem;
+  color: var(--color-teal);
+  font-weight: 600;
+  margin: calc(-1 * var(--space-2)) 0 0;
+}
+
+.pathway-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Metrics ────────────────────────────────────────────────────────────── */
+.pathway-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.pathway-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metric-label {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.metric-savings {
+  color: #059669;
+}
+
+.metric-incentive {
+  color: #2563eb;
+}
+
+.metric-co2 {
+  color: #047857;
+}
+
+/* ─── Highlights ─────────────────────────────────────────────────────────── */
+.pathway-highlights {
+  flex: 1;
+}
+
+.pathway-highlights-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.pathway-highlights-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pathway-highlights-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.84rem;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.highlight-check {
+  color: var(--color-teal);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─── Card footer ────────────────────────────────────────────────────────── */
+.pathway-footer {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.pathway-duration {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── CTA section ────────────────────────────────────────────────────────── */
+.pathways-cta-section {
+  background: linear-gradient(135deg, #0d1f2d 0%, #1a3a4a 50%, #0a2e2a 100%);
+  padding: 80px var(--space-6);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.pathways-cta-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(20, 184, 166, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.pathways-cta-inner {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.pathways-cta-badge {
+  display: inline-block;
+  background: rgba(20, 184, 166, 0.15);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  color: #5eead4;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--space-2) var(--space-4);
+  border-radius: 100px;
+}
+
+.pathways-cta-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.pathways-cta-sub {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.pathways-cta-btn {
+  font-size: 1rem;
+  padding: var(--space-4) var(--space-8);
+}
+
+.pathways-cta-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5);
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.pathways-footer {
+  background: #0a1628;
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+}
+
+.pathways-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.footer-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.footer-logo-by {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: var(--space-2);
+}
+
+.footer-copy {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .pathways-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pathways-stats-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .pathways-nav .nav-links {
+    display: none;
+  }
+
+  .pathways-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .pathways-stats-inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pathway-metrics {
+    grid-template-columns: 1fr;
+  }
+}
