@@ -12,7 +12,7 @@ export default function PreviewResults() {
     return null
   }
 
-  const pathways: PreviewPathway[] = preview.pathwaysBlurred ?? []
+  const pathways: PreviewPathway[] = preview.pathways ?? []
 
   return (
     <div className="preview-page">
@@ -38,7 +38,7 @@ export default function PreviewResults() {
           <div>
             <h1 className="preview-banner-title">La tua analisi è pronta!</h1>
             <p className="preview-banner-sub">
-              Abbiamo identificato <strong>{preview.percorsiCount} percorsi di efficientamento</strong> per il tuo edificio.
+              Abbiamo identificato <strong>{preview.pathwayCount} percorsi di efficientamento</strong> per il tuo edificio.
               Crea un account gratuito per accedere ai risultati completi e al tuo consulente arCO₂.
             </p>
           </div>
@@ -47,15 +47,15 @@ export default function PreviewResults() {
         {/* ─── Stats row ──────────────────────────────────────────────── */}
         <div className="preview-stats fade-in">
           <div className="preview-stat card">
-            <span className="preview-stat-value">{preview.risparmioTotale}</span>
+            <span className="preview-stat-value">{preview.totalSavings}</span>
             <span className="preview-stat-label">risparmio energetico potenziale</span>
           </div>
           <div className="preview-stat card">
-            <span className="preview-stat-value">{preview.riduzioneCO2}</span>
+            <span className="preview-stat-value">{preview.co2Reduction}</span>
             <span className="preview-stat-label">riduzione CO₂ annua</span>
           </div>
           <div className="preview-stat card">
-            <span className="preview-stat-value">{preview.incentiviDisponibili}</span>
+            <span className="preview-stat-value">{preview.availableIncentives}</span>
             <span className="preview-stat-label">incentivi disponibili</span>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function PreviewResults() {
           {/* ─── Pathways preview ───────────────────────────────────── */}
           <div className="preview-pathways">
             <h2 className="preview-section-title">
-              I {preview.percorsiCount} percorsi identificati per te
+              I {preview.pathwayCount} percorsi identificati per te
             </h2>
 
             {pathways.length === 0 ? (
@@ -88,7 +88,7 @@ export default function PreviewResults() {
               <h3>Accedi ai risultati completi</h3>
               <p>Crea il tuo account gratuito per:</p>
               <ul className="cta-benefits">
-                <li>📋 Tutti i {preview.percorsiCount} percorsi con dettagli, costi e incentivi</li>
+                <li>📋 Tutti i {preview.pathwayCount} percorsi con dettagli, costi e incentivi</li>
                 <li>👤 Un consulente arCO₂ assegnato personalmente</li>
                 <li>📁 Il dossier edificio digitale</li>
                 <li>💶 Lista completa degli incentivi accessibili</li>
@@ -132,8 +132,8 @@ export default function PreviewResults() {
 // ─── Pathway preview card ──────────────────────────────────────────────────────
 function PathwayPreviewCard({ pathway, rank }: { pathway: PreviewPathway; rank: number }) {
   const badgeClass =
-    pathway.priorita === 'alta' ? 'badge-alta' :
-    pathway.priorita === 'media' ? 'badge-media' : 'badge-bassa'
+    pathway.priority === 'high' ? 'badge-high' :
+    pathway.priority === 'medium' ? 'badge-medium' : 'badge-low'
 
   return (
     <div className={`preview-pathway-card card ${!pathway.visible ? 'preview-pathway-locked' : 'preview-pathway-visible'}`}>
@@ -142,13 +142,13 @@ function PathwayPreviewCard({ pathway, rank }: { pathway: PreviewPathway; rank: 
       </div>
 
       <div className="ppc-icon-col">
-        <span className="ppc-icon">{pathway.icona}</span>
+        <span className="ppc-icon">{pathway.icon}</span>
       </div>
 
       <div className="ppc-content">
         <div className="ppc-title-row">
-          <span className="ppc-title">{pathway.titolo}</span>
-          <span className={`badge ${badgeClass}`}>{pathway.etichetta}</span>
+          <span className="ppc-title">{pathway.title}</span>
+          <span className={`badge ${badgeClass}`}>{pathway.label}</span>
         </div>
 
         {pathway.visible ? (
@@ -156,13 +156,13 @@ function PathwayPreviewCard({ pathway, rank }: { pathway: PreviewPathway; rank: 
           <div className="ppc-stats">
             <span className="ppc-stat">
               <span className="ppc-stat-icon">💰</span>
-              <span className="ppc-stat-value">{pathway.risparmioStimato}</span>
+              <span className="ppc-stat-value">{pathway.estimatedSavings}</span>
               <span className="ppc-stat-label">risparmio</span>
             </span>
             <span className="ppc-stat-divider" />
             <span className="ppc-stat">
               <span className="ppc-stat-icon">🌿</span>
-              <span className="ppc-stat-value">{pathway.riduzioneCO2}</span>
+              <span className="ppc-stat-value">{pathway.co2Reduction}</span>
               <span className="ppc-stat-label">CO₂ ridotta</span>
             </span>
             <span className="ppc-stat-divider" />

@@ -193,9 +193,9 @@ input, select, textarea {
   letter-spacing: 0.02em;
 }
 
-.badge-alta { background: var(--color-green-light); color: var(--color-green); }
-.badge-media { background: var(--color-amber-light); color: #b45309; }
-.badge-bassa { background: var(--color-border-light); color: var(--color-text-secondary); }
+.badge-high { background: var(--color-red-light); color: var(--color-red); }
+.badge-medium { background: var(--color-amber-light); color: #b45309; }
+.badge-low { background: var(--color-border-light); color: var(--color-text-secondary); }
 .badge-primary { background: var(--color-primary-light); color: var(--color-primary-dark); }
 
 /* ─── Form ───────────────────────────────────────────────────────────────────── */

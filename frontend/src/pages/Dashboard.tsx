@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../App'
-import { DashboardData, Pathway, ProssimoStep } from '../types'
+import { DashboardData, Pathway, NextStep } from '../types'
 import { apiUrl } from '../lib/api'
 import './Dashboard.css'
 
-type NavSection = 'panoramica' | 'dossier' | 'percorsi' | 'consulente' | 'documenti'
+type NavSection = 'overview' | 'dossier' | 'pathways' | 'consultant' | 'documents'
 
 const NAV_ITEMS: { id: NavSection; label: string; icon: string }[] = [
-  { id: 'panoramica', label: 'Panoramica', icon: '🏠' },
+  { id: 'overview', label: 'Panoramica', icon: '🏠' },
   { id: 'dossier', label: 'Dossier edificio', icon: '📁' },
-  { id: 'percorsi', label: 'Percorsi', icon: '🗺️' },
-  { id: 'consulente', label: 'Consulente', icon: '👤' },
-  { id: 'documenti', label: 'Documenti', icon: '📄' },
+  { id: 'pathways', label: 'Percorsi', icon: '🗺️' },
+  { id: 'consultant', label: 'Consulente', icon: '👤' },
+  { id: 'documents', label: 'Documenti', icon: '📄' },
 ]
 
 export default function Dashboard() {
@@ -22,7 +22,7 @@ export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [activeSection, setActiveSection] = useState<NavSection>('panoramica')
+  const [activeSection, setActiveSection] = useState<NavSection>('overview')
   const [expandedPathway, setExpandedPathway] = useState<string | null>(null)
 
   useEffect(() => {
@@ -59,10 +59,10 @@ export default function Dashboard() {
     </div>
   )
 
-  const { user, consulente, dossierEdificio, percorsi, prossimiPassi, statistiche, progressoGlobale } = data
-  const topPercorso = percorsi[0]
-  const initials = `${user.nome[0]}${user.cognome[0]}`.toUpperCase()
-  const consInitials = `${consulente.nome[0]}${consulente.cognome[0]}`.toUpperCase()
+  const { user, consultant, buildingDossier, pathways, nextSteps, statistics, globalProgress } = data
+  const topPathway = pathways[0]
+  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+  const consInitials = `${consultant.firstName[0]}${consultant.lastName[0]}`.toUpperCase()
 
   return (
     <div className="dashboard">
@@ -94,10 +94,10 @@ export default function Dashboard() {
         <div className="sidebar-progress">
           <div className="sidebar-progress-label">
             <span>Completamento dossier</span>
-            <strong>{progressoGlobale}%</strong>
+            <strong>{globalProgress}%</strong>
           </div>
           <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${progressoGlobale}%` }}></div>
+            <div className="progress-fill" style={{ width: `${globalProgress}%` }}></div>
           </div>
           <p className="sidebar-progress-note">Modulo 1 completato · 9 moduli rimanenti</p>
         </div>
@@ -119,94 +119,94 @@ export default function Dashboard() {
               <span>🔔</span>
               <span className="notif-badge">1</span>
             </div>
-            <div className="topbar-avatar" title={`${user.nome} ${user.cognome}`}>
+            <div className="topbar-avatar" title={`${user.firstName} ${user.lastName}`}>
               {initials}
             </div>
             <div className="topbar-user-info">
-              <span className="topbar-user-name">{user.nome} {user.cognome}</span>
-              <span className="topbar-user-comune">{user.comune}</span>
+              <span className="topbar-user-name">{user.firstName} {user.lastName}</span>
+              <span className="topbar-user-comune">{user.municipality}</span>
             </div>
           </div>
         </header>
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* PANORAMICA */}
+        {/* OVERVIEW */}
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {activeSection === 'panoramica' && (
+        {activeSection === 'overview' && (
           <div className="dashboard-content fade-in">
             <div className="welcome-banner">
               <div className="welcome-text">
-                <h2>Benvenuto, {user.nome}! 👋</h2>
+                <h2>Benvenuto, {user.firstName}! 👋</h2>
                 <p>Il tuo percorso arCO₂ è appena iniziato. Ecco un riepilogo della tua situazione energetica e i prossimi passi consigliati.</p>
               </div>
               <div className="welcome-consult">
                 <div className="welcome-consult-avatar">{consInitials}</div>
                 <div>
                   <div className="welcome-consult-label">Il tuo consulente</div>
-                  <div className="welcome-consult-name">{consulente.nome} {consulente.cognome}</div>
+                  <div className="welcome-consult-name">{consultant.firstName} {consultant.lastName}</div>
                 </div>
               </div>
             </div>
 
             {/* Stats row */}
             <div className="stats-grid">
-              <StatCard icon="💰" value={statistiche.risparmioPotenziale} label="Risparmio energetico potenziale" color="primary" />
-              <StatCard icon="🌿" value={statistiche.riduzioneCO2} label="Riduzione CO₂ stimata" color="green" />
-              <StatCard icon="💶" value={statistiche.incentiviDisponibili} label="Incentivi accessibili" color="amber" />
-              <StatCard icon="⏱️" value={statistiche.tempoStimato} label="Tempo stimato primo intervento" color="teal" />
+              <StatCard icon="💰" value={statistics.potentialSavings} label="Risparmio energetico potenziale" color="primary" />
+              <StatCard icon="🌿" value={statistics.co2Reduction} label="Riduzione CO₂ stimata" color="green" />
+              <StatCard icon="💶" value={statistics.availableIncentives} label="Incentivi accessibili" color="amber" />
+              <StatCard icon="⏱️" value={statistics.estimatedTime} label="Tempo stimato primo intervento" color="teal" />
             </div>
 
             {/* Main grid */}
             <div className="panoramica-grid">
-              {/* Top percorso */}
+              {/* Top pathway */}
               <div className="panoramica-main">
-                {topPercorso && (
+                {topPathway && (
                   <div className="top-pathway-card card">
                     <div className="tpc-header">
                       <span className="section-label">Percorso principale consigliato</span>
-                      <span className="badge badge-alta">{topPercorso.etichetta}</span>
+                      <span className="badge badge-high">{topPathway.label}</span>
                     </div>
                     <div className="tpc-body">
-                      <span className="tpc-icon">{topPercorso.icona}</span>
+                      <span className="tpc-icon">{topPathway.icon}</span>
                       <div>
-                        <h3 className="tpc-title">{topPercorso.titolo}</h3>
-                        <p className="tpc-desc">{topPercorso.descrizione}</p>
+                        <h3 className="tpc-title">{topPathway.title}</h3>
+                        <p className="tpc-desc">{topPathway.description}</p>
                         <div className="tpc-metrics">
                           <div className="tpc-metric">
                             <span className="metric-label">Risparmio</span>
-                            <span className="metric-value green">{topPercorso.risparmioStimato}</span>
+                            <span className="metric-value green">{topPathway.estimatedSavings}</span>
                           </div>
                           <div className="tpc-metric">
                             <span className="metric-label">Costo stimato</span>
-                            <span className="metric-value">{topPercorso.costoStimato}</span>
+                            <span className="metric-value">{topPathway.estimatedCost}</span>
                           </div>
                           <div className="tpc-metric">
                             <span className="metric-label">Incentivo max</span>
-                            <span className="metric-value amber">{topPercorso.incentivoMassimo}</span>
+                            <span className="metric-value amber">{topPathway.maxIncentive}</span>
                           </div>
                           <div className="tpc-metric">
                             <span className="metric-label">Riduzione CO₂</span>
-                            <span className="metric-value">{topPercorso.riduzioneCO2}</span>
+                            <span className="metric-value">{topPathway.co2Reduction}</span>
                           </div>
                         </div>
                         <div className="tpc-incentivi">
-                          {topPercorso.incentivi.map((inc) => (
+                          {topPathway.incentives.map((inc) => (
                             <span key={inc} className="incentivo-chip">{inc}</span>
                           ))}
                         </div>
                       </div>
                     </div>
-                    <button className="btn btn-primary btn-sm" onClick={() => setActiveSection('percorsi')}>
+                    <button className="btn btn-primary btn-sm" onClick={() => setActiveSection('pathways')}>
                       Vedi tutti i percorsi →
                     </button>
                   </div>
                 )}
 
-                {/* Prossimi passi */}
+                {/* Next steps */}
                 <div className="next-steps-card card">
                   <h3 className="section-label" style={{ marginBottom: 'var(--space-4)' }}>Prossimi passi</h3>
                   <div className="next-steps-list">
-                    {prossimiPassi.map((step) => (
+                    {nextSteps.map((step) => (
                       <NextStepRow key={step.id} step={step} />
                     ))}
                   </div>
@@ -215,19 +215,19 @@ export default function Dashboard() {
 
               {/* Right column */}
               <div className="panoramica-side">
-                <ConsulentCard consulente={consulente} consInitials={consInitials} compact />
-                {dossierEdificio && <DossierMiniCard dossier={dossierEdificio} onClick={() => setActiveSection('dossier')} />}
+                <ConsultantCard consultant={consultant} consInitials={consInitials} compact />
+                {buildingDossier && <DossierMiniCard dossier={buildingDossier} onClick={() => setActiveSection('dossier')} />}
               </div>
             </div>
           </div>
         )}
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* DOSSIER EDIFICIO */}
+        {/* BUILDING DOSSIER */}
         {/* ─────────────────────────────────────────────────────────────────── */}
         {activeSection === 'dossier' && (
           <div className="dashboard-content fade-in">
-            {dossierEdificio ? (
+            {buildingDossier ? (
               <>
                 <div className="dossier-completion card" style={{ marginBottom: 'var(--space-6)' }}>
                   <div className="dc-header">
@@ -235,10 +235,10 @@ export default function Dashboard() {
                       <h3>Completamento dossier</h3>
                       <p>Modulo 1 completato · Aggiungi indirizzo e dati tecnici per sbloccare l'analisi avanzata</p>
                     </div>
-                    <div className="dc-percent">{dossierEdificio.completamento}%</div>
+                    <div className="dc-percent">{buildingDossier.completion}%</div>
                   </div>
                   <div className="progress-track" style={{ marginTop: 'var(--space-3)' }}>
-                    <div className="progress-fill" style={{ width: `${dossierEdificio.completamento}%` }}></div>
+                    <div className="progress-fill" style={{ width: `${buildingDossier.completion}%` }}></div>
                   </div>
                   <div className="dc-modules">
                     <DossierModule num={1} label="Orientamento iniziale" done />
@@ -252,12 +252,12 @@ export default function Dashboard() {
                   <div className="dossier-data card">
                     <h3 className="dossier-section-title">📋 Dati edificio</h3>
                     <div className="dossier-fields">
-                      <DossierField label="Tipo di edificio" value={dossierEdificio.tipo} icon="🏠" />
-                      <DossierField label="Anno di costruzione" value={dossierEdificio.anno} icon="📅" />
-                      <DossierField label="Superficie abitabile" value={dossierEdificio.superficie} icon="📐" />
-                      <DossierField label="Sistema di riscaldamento" value={dossierEdificio.riscaldamento} icon="🌡️" />
-                      <DossierField label="Classe energetica" value={dossierEdificio.classeEnergetica} icon="⚡" />
-                      <DossierField label="Comune" value={dossierEdificio.comune} icon="📍" />
+                      <DossierField label="Tipo di edificio" value={buildingDossier.type} icon="🏠" />
+                      <DossierField label="Anno di costruzione" value={buildingDossier.year} icon="📅" />
+                      <DossierField label="Superficie abitabile" value={buildingDossier.area} icon="📐" />
+                      <DossierField label="Sistema di riscaldamento" value={buildingDossier.heating} icon="🌡️" />
+                      <DossierField label="Classe energetica" value={buildingDossier.energyClass} icon="⚡" />
+                      <DossierField label="Comune" value={buildingDossier.municipality} icon="📍" />
                     </div>
                     <div className="dossier-missing">
                       <span className="missing-label">⚠️ Da completare nel Modulo 2:</span>
@@ -271,7 +271,7 @@ export default function Dashboard() {
                   <div className="dossier-goals card">
                     <h3 className="dossier-section-title">🎯 Obiettivi dichiarati</h3>
                     <div className="goals-list">
-                      {dossierEdificio.obiettivi.map((ob) => (
+                      {buildingDossier.goals.map((ob) => (
                         <span key={ob} className="goal-chip">{ob}</span>
                       ))}
                     </div>
@@ -304,15 +304,15 @@ export default function Dashboard() {
         )}
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* PERCORSI */}
+        {/* PATHWAYS */}
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {activeSection === 'percorsi' && (
+        {activeSection === 'pathways' && (
           <div className="dashboard-content fade-in">
             <div className="percorsi-intro">
-              <p>Basandoci sul tuo edificio e sui tuoi obiettivi, abbiamo identificato <strong>{percorsi.length} percorsi di efficientamento</strong>. Sono ordinati per priorità e impatto stimato.</p>
+              <p>Basandoci sul tuo edificio e sui tuoi obiettivi, abbiamo identificato <strong>{pathways.length} percorsi di efficientamento</strong>. Sono ordinati per priorità e impatto stimato.</p>
             </div>
             <div className="percorsi-list">
-              {percorsi.map((pathway, i) => (
+              {pathways.map((pathway, i) => (
                 <PathwayCard
                   key={pathway.id}
                   pathway={pathway}
@@ -326,18 +326,18 @@ export default function Dashboard() {
         )}
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* CONSULENTE */}
+        {/* CONSULTANT */}
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {activeSection === 'consulente' && (
+        {activeSection === 'consultant' && (
           <div className="dashboard-content fade-in">
-            <ConsulentCard consulente={consulente} consInitials={consInitials} full />
+            <ConsultantCard consultant={consultant} consInitials={consInitials} full />
           </div>
         )}
 
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {/* DOCUMENTI */}
+        {/* DOCUMENTS */}
         {/* ─────────────────────────────────────────────────────────────────── */}
-        {activeSection === 'documenti' && (
+        {activeSection === 'documents' && (
           <div className="dashboard-content fade-in">
             <div className="docs-empty-page card">
               <span className="docs-empty-icon" style={{ fontSize: 48 }}>📁</span>
@@ -367,32 +367,32 @@ function StatCard({ icon, value, label, color }: { icon: string; value: string; 
   )
 }
 
-function NextStepRow({ step }: { step: ProssimoStep }) {
+function NextStepRow({ step }: { step: NextStep }) {
   const statusConfig: Record<string, { icon: string; class: string }> = {
-    da_fare: { icon: '▶️', class: 'status-todo' },
-    attesa: { icon: '⏳', class: 'status-wait' },
-    bloccato: { icon: '🔒', class: 'status-locked' },
-    completato: { icon: '✅', class: 'status-done' },
+    todo: { icon: '▶️', class: 'status-todo' },
+    waiting: { icon: '⏳', class: 'status-wait' },
+    locked: { icon: '🔒', class: 'status-locked' },
+    done: { icon: '✅', class: 'status-done' },
   }
-  const { icon, class: cls } = statusConfig[step.stato] ?? statusConfig.da_fare
-  const urgClass = step.urgenza === 'alta' ? 'urgenza-alta' : step.urgenza === 'media' ? 'urgenza-media' : ''
+  const { icon, class: cls } = statusConfig[step.status] ?? statusConfig.todo
+  const urgClass = step.urgency === 'high' ? 'urgency-high' : step.urgency === 'medium' ? 'urgency-medium' : ''
 
   return (
     <div className={`next-step-row ${cls}`}>
       <span className="ns-icon">{icon}</span>
       <div className="ns-content">
-        <div className="ns-title">{step.titolo}</div>
-        <div className="ns-desc">{step.descrizione}</div>
+        <div className="ns-title">{step.title}</div>
+        <div className="ns-desc">{step.description}</div>
       </div>
       <div className={`ns-urgenza ${urgClass}`}>
-        Modulo {step.modulo}
+        Modulo {step.module}
       </div>
     </div>
   )
 }
 
-function ConsulentCard({ consulente, consInitials, compact = false, full = false }: {
-  consulente: DashboardData['consulente']
+function ConsultantCard({ consultant, consInitials, compact = false, full = false }: {
+  consultant: DashboardData['consultant']
   consInitials: string
   compact?: boolean
   full?: boolean
@@ -402,18 +402,18 @@ function ConsulentCard({ consulente, consInitials, compact = false, full = false
       <div className="cc-header">
         <div className="cc-avatar">{consInitials}</div>
         <div>
-          <div className="cc-name">{consulente.nome} {consulente.cognome}</div>
-          <div className="cc-spec">{consulente.specializzazione}</div>
-          {!compact && <div className="cc-exp">{consulente.esperienza}</div>}
+          <div className="cc-name">{consultant.firstName} {consultant.lastName}</div>
+          <div className="cc-spec">{consultant.specialization}</div>
+          {!compact && <div className="cc-exp">{consultant.experience}</div>}
         </div>
         <div className="cc-online-badge">🟢 Disponibile</div>
       </div>
       {!compact && (
         <>
           <div className="cc-info">
-            <div className="cc-info-row"><span>📧</span><a href={`mailto:${consulente.email}`}>{consulente.email}</a></div>
-            <div className="cc-info-row"><span>📞</span><span>{consulente.telefono}</span></div>
-            <div className="cc-info-row"><span>🕐</span><span>{consulente.disponibilita}</span></div>
+            <div className="cc-info-row"><span>📧</span><a href={`mailto:${consultant.email}`}>{consultant.email}</a></div>
+            <div className="cc-info-row"><span>📞</span><span>{consultant.phone}</span></div>
+            <div className="cc-info-row"><span>🕐</span><span>{consultant.availability}</span></div>
           </div>
           {full && (
             <div className="cc-actions">
@@ -434,30 +434,30 @@ function ConsulentCard({ consulente, consInitials, compact = false, full = false
       )}
       {compact && (
         <div className="cc-compact-info">
-          <span>📧 {consulente.email}</span>
-          <span>🕐 {consulente.disponibilita}</span>
+          <span>📧 {consultant.email}</span>
+          <span>🕐 {consultant.availability}</span>
         </div>
       )}
     </div>
   )
 }
 
-function DossierMiniCard({ dossier, onClick }: { dossier: DashboardData['dossierEdificio']; onClick: () => void }) {
+function DossierMiniCard({ dossier, onClick }: { dossier: DashboardData['buildingDossier']; onClick: () => void }) {
   if (!dossier) return null
   return (
     <div className="dossier-mini-card card" onClick={onClick} style={{ cursor: 'pointer' }}>
       <div className="dmc-header">
         <span>📁</span>
         <span>Dossier edificio</span>
-        <span className="badge badge-primary">{dossier.completamento}%</span>
+        <span className="badge badge-primary">{dossier.completion}%</span>
       </div>
       <div className="dmc-body">
-        <span className="dmc-item">{dossier.tipo}</span>
-        <span className="dmc-item">{dossier.anno}</span>
-        <span className="dmc-item">{dossier.riscaldamento}</span>
+        <span className="dmc-item">{dossier.type}</span>
+        <span className="dmc-item">{dossier.year}</span>
+        <span className="dmc-item">{dossier.heating}</span>
       </div>
       <div className="progress-track" style={{ marginTop: 'var(--space-3)' }}>
-        <div className="progress-fill" style={{ width: `${dossier.completamento}%` }}></div>
+        <div className="progress-fill" style={{ width: `${dossier.completion}%` }}></div>
       </div>
       <p className="dmc-cta">Completa il dossier →</p>
     </div>
@@ -467,7 +467,7 @@ function DossierMiniCard({ dossier, onClick }: { dossier: DashboardData['dossier
 function PathwayCard({ pathway, rank, expanded, onToggle }: {
   pathway: Pathway; rank: number; expanded: boolean; onToggle: () => void
 }) {
-  const badgeClass = pathway.priorita === 'alta' ? 'badge-alta' : pathway.priorita === 'media' ? 'badge-media' : 'badge-bassa'
+  const badgeClass = pathway.priority === 'high' ? 'badge-high' : pathway.priority === 'medium' ? 'badge-medium' : 'badge-low'
 
   return (
     <div className={`pathway-card card ${expanded ? 'pathway-card-expanded' : ''}`}>
@@ -475,21 +475,21 @@ function PathwayCard({ pathway, rank, expanded, onToggle }: {
         <div className="pathway-rank">
           <span className={`rank-circle ${rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : 'rank-other'}`}>{rank}</span>
         </div>
-        <span className="pathway-icon">{pathway.icona}</span>
+        <span className="pathway-icon">{pathway.icon}</span>
         <div className="pathway-header-text">
           <div className="pathway-title-row">
-            <h3 className="pathway-title">{pathway.titolo}</h3>
-            <span className={`badge ${badgeClass}`}>{pathway.etichetta}</span>
+            <h3 className="pathway-title">{pathway.title}</h3>
+            <span className={`badge ${badgeClass}`}>{pathway.label}</span>
           </div>
-          <p className="pathway-summary">{pathway.descrizione}</p>
+          <p className="pathway-summary">{pathway.description}</p>
         </div>
         <div className="pathway-quick-stats">
           <div className="pqs">
-            <span className="pqs-value" style={{ color: 'var(--color-green)' }}>{pathway.risparmioStimato}</span>
+            <span className="pqs-value" style={{ color: 'var(--color-green)' }}>{pathway.estimatedSavings}</span>
             <span className="pqs-label">risparmio</span>
           </div>
           <div className="pqs">
-            <span className="pqs-value">{pathway.costoStimato}</span>
+            <span className="pqs-value">{pathway.estimatedCost}</span>
             <span className="pqs-label">costo</span>
           </div>
         </div>
@@ -502,17 +502,17 @@ function PathwayCard({ pathway, rank, expanded, onToggle }: {
             <div className="pathway-detail-section">
               <h4>📊 Dati tecnici</h4>
               <div className="pathway-detail-rows">
-                <div className="pdr"><span>Risparmio energetico</span><strong>{pathway.risparmioKwh}</strong></div>
-                <div className="pdr"><span>Riduzione CO₂</span><strong>{pathway.riduzioneCO2}</strong></div>
-                <div className="pdr"><span>Durata lavori</span><strong>{pathway.durata}</strong></div>
-                <div className="pdr"><span>Costo stimato</span><strong>{pathway.costoStimato}</strong></div>
-                <div className="pdr"><span>Incentivo massimo</span><strong style={{ color: 'var(--color-green)' }}>{pathway.incentivoMassimo}</strong></div>
+                <div className="pdr"><span>Risparmio energetico</span><strong>{pathway.savingsKwh}</strong></div>
+                <div className="pdr"><span>Riduzione CO₂</span><strong>{pathway.co2Reduction}</strong></div>
+                <div className="pdr"><span>Durata lavori</span><strong>{pathway.duration}</strong></div>
+                <div className="pdr"><span>Costo stimato</span><strong>{pathway.estimatedCost}</strong></div>
+                <div className="pdr"><span>Incentivo massimo</span><strong style={{ color: 'var(--color-green)' }}>{pathway.maxIncentive}</strong></div>
               </div>
             </div>
             <div className="pathway-detail-section">
               <h4>💶 Incentivi applicabili</h4>
               <div className="pathway-incentivi-list">
-                {pathway.incentivi.map((inc) => (
+                {pathway.incentives.map((inc) => (
                   <div key={inc} className="inc-row">
                     <span className="inc-dot"></span>
                     <span>{inc}</span>
@@ -521,7 +521,7 @@ function PathwayCard({ pathway, rank, expanded, onToggle }: {
               </div>
               <h4 style={{ marginTop: 'var(--space-5)' }}>🗺️ Passi del percorso</h4>
               <ol className="pathway-steps-list">
-                {pathway.passi.map((step, i) => (
+                {pathway.steps.map((step, i) => (
                   <li key={i}>{step}</li>
                 ))}
               </ol>

@@ -13,7 +13,7 @@ interface Option {
 }
 
 interface Step {
-  id: keyof QuestionnaireData | 'obiettivi'
+  id: keyof QuestionnaireData | 'goals'
   question: string
   hint?: string
   type: 'single' | 'multi'
@@ -22,7 +22,7 @@ interface Step {
 
 const STEPS: Step[] = [
   {
-    id: 'tipoEdificio',
+    id: 'buildingType',
     question: 'Che tipo di edificio possiedi?',
     hint: 'Seleziona la tipologia che descrive meglio il tuo immobile',
     type: 'single',
@@ -34,7 +34,7 @@ const STEPS: Step[] = [
     ],
   },
   {
-    id: 'annoCostruzione',
+    id: 'yearBuilt',
     question: 'Quando è stato costruito l\'edificio?',
     hint: 'L\'anno di costruzione influenza il tipo di isolamento e impianti presenti',
     type: 'single',
@@ -46,7 +46,7 @@ const STEPS: Step[] = [
     ],
   },
   {
-    id: 'superficie',
+    id: 'area',
     question: 'Qual è la superficie abitabile?',
     hint: 'La superficie determina il dimensionamento ottimale degli impianti',
     type: 'single',
@@ -58,7 +58,7 @@ const STEPS: Step[] = [
     ],
   },
   {
-    id: 'riscaldamento',
+    id: 'heating',
     question: 'Come riscaldi attualmente la casa?',
     hint: 'Il sistema di riscaldamento è uno dei fattori principali per il risparmio energetico',
     type: 'single',
@@ -71,7 +71,7 @@ const STEPS: Step[] = [
     ],
   },
   {
-    id: 'classeEnergetica',
+    id: 'energyClass',
     question: 'Conosci la classe energetica dell\'edificio?',
     hint: 'La trovi nel certificato energetico CECE o nella documentazione di acquisto',
     type: 'single',
@@ -84,7 +84,7 @@ const STEPS: Step[] = [
     ],
   },
   {
-    id: 'obiettivi',
+    id: 'goals',
     question: 'Quali sono i tuoi obiettivi principali?',
     hint: 'Puoi selezionare più opzioni — ci aiuta a personalizzare i percorsi consigliati',
     type: 'multi',
@@ -156,12 +156,12 @@ export default function Questionnaire() {
     setError('')
     try {
       const payload: QuestionnaireData = {
-        tipoEdificio: answers.tipoEdificio ?? '',
-        annoCostruzione: answers.annoCostruzione ?? '',
-        superficie: answers.superficie ?? '',
-        riscaldamento: answers.riscaldamento ?? '',
-        classeEnergetica: answers.classeEnergetica ?? '',
-        obiettivi: Array.isArray(answers.obiettivi) ? answers.obiettivi : [],
+        buildingType: answers.buildingType ?? '',
+        yearBuilt: answers.yearBuilt ?? '',
+        area: answers.area ?? '',
+        heating: answers.heating ?? '',
+        energyClass: answers.energyClass ?? '',
+        goals: Array.isArray(answers.goals) ? answers.goals : [],
       }
 
       const res = await fetch(apiUrl('/api/questionnaire'), {

@@ -1,75 +1,75 @@
 export interface QuestionnaireData {
-  tipoEdificio: string
-  annoCostruzione: string
-  superficie: string
-  riscaldamento: string
-  classeEnergetica: string
-  obiettivi: string[]
+  buildingType: string
+  yearBuilt: string
+  area: string
+  heating: string
+  energyClass: string
+  goals: string[]
 }
 
 export interface Pathway {
   id: string
-  titolo: string
-  descrizione: string
+  title: string
+  description: string
   score: number
-  risparmioStimato: string
-  risparmioKwh: string
-  costoStimato: string
-  incentivi: string[]
-  incentivoMassimo: string
-  durata: string
-  riduzioneCO2: string
-  icona: string
-  etichetta: string
-  priorita: 'alta' | 'media' | 'bassa'
-  passi: string[]
+  estimatedSavings: string
+  savingsKwh: string
+  estimatedCost: string
+  incentives: string[]
+  maxIncentive: string
+  duration: string
+  co2Reduction: string
+  icon: string
+  label: string
+  priority: 'high' | 'medium' | 'low'
+  steps: string[]
 }
 
-export interface Consulente {
+export interface Consultant {
   id: string
-  nome: string
-  cognome: string
+  firstName: string
+  lastName: string
   email: string
-  telefono: string
-  specializzazione: string
-  disponibilita: string
-  esperienza: string
+  phone: string
+  specialization: string
+  availability: string
+  experience: string
 }
 
-export interface DossierEdificio {
-  tipo: string
-  anno: string
-  superficie: string
-  riscaldamento: string
-  classeEnergetica: string
-  obiettivi: string[]
-  completamento: number
-  indirizzo: string | null
-  comune: string
+export interface BuildingDossier {
+  type: string
+  year: string
+  area: string
+  heating: string
+  energyClass: string
+  goals: string[]
+  completion: number
+  address: string | null
+  municipality: string
 }
 
 export interface DashboardData {
-  user: { id: string; nome: string; cognome: string; email: string; comune: string }
-  consulente: Consulente
-  dossierEdificio: DossierEdificio | null
-  percorsi: Pathway[]
-  prossimiPassi: ProssimoStep[]
-  statistiche: {
-    risparmioPotenziale: string
-    riduzioneCO2: string
-    incentiviDisponibili: string
-    tempoStimato: string
+  user: { id: string; firstName: string; lastName: string; email: string; municipality: string }
+  consultant: Consultant
+  buildingDossier: BuildingDossier | null
+  pathways: Pathway[]
+  nextSteps: NextStep[]
+  statistics: {
+    potentialSavings: string
+    co2Reduction: string
+    availableIncentives: string
+    estimatedTime: string
   }
-  progressoGlobale: number
+  globalProgress: number
 }
 
-export interface ProssimoStep {
+export interface NextStep {
   id: number
-  titolo: string
-  descrizione: string
-  modulo: number
-  stato: 'da_fare' | 'attesa' | 'bloccato' | 'completato'
-  urgenza: 'alta' | 'media' | 'bassa'
+  title: string
+  description: string
+  module: number
+  status: 'todo' | 'waiting' | 'locked' | 'done'
+  urgency: 'high' | 'medium' | 'low'
 }
 
 export interface AuthState {

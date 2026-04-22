@@ -27,23 +27,23 @@ interface QCtx {
 
 export interface PreviewPathway {
   id: string
-  titolo: string
-  risparmioStimato: string
-  riduzioneCO2: string
-  etichetta: string
-  priorita: string
-  icona: string
+  title: string
+  estimatedSavings: string
+  co2Reduction: string
+  label: string
+  priority: string
+  icon: string
   visible: boolean   // true = top 2, mostra dettagli; false = bloccato
 }
 
 export interface PreviewData {
-  percorsiCount: number
-  topPercorso: string
-  secondPercorso: string
-  risparmioTotale: string
-  riduzioneCO2: string
-  incentiviDisponibili: string
-  pathwaysBlurred: PreviewPathway[]
+  pathwayCount: number
+  topPathway: string
+  secondPathway: string
+  totalSavings: string
+  co2Reduction: string
+  availableIncentives: string
+  pathways: PreviewPathway[]
 }
 
 const QContext = createContext<QCtx>({

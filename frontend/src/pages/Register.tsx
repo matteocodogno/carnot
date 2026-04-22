@@ -17,8 +17,8 @@ export default function Register() {
   const { tempToken } = useQuestionnaire()
 
   const [form, setForm] = useState({
-    nome: '', cognome: '', email: '',
-    password: '', comune: '',
+    firstName: '', lastName: '', email: '',
+    password: '', municipality: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -30,11 +30,11 @@ export default function Register() {
   }
 
   function validate(): string | null {
-    if (!form.nome.trim()) return 'Inserisci il tuo nome'
-    if (!form.cognome.trim()) return 'Inserisci il tuo cognome'
+    if (!form.firstName.trim()) return 'Inserisci il tuo nome'
+    if (!form.lastName.trim()) return 'Inserisci il tuo cognome'
     if (!form.email.includes('@')) return 'Inserisci un\'email valida'
     if (form.password.length < 8) return 'La password deve avere almeno 8 caratteri'
-    if (!form.comune) return 'Seleziona il tuo comune'
+    if (!form.municipality) return 'Seleziona il tuo comune'
     return null
   }
 
@@ -69,8 +69,8 @@ export default function Register() {
     }
   }
 
-  const isComplete = form.nome && form.cognome && form.email &&
-    form.password.length >= 8 && form.comune
+  const isComplete = form.firstName && form.lastName && form.email &&
+    form.password.length >= 8 && form.municipality
 
   return (
     <div className="register-page">
@@ -128,8 +128,8 @@ export default function Register() {
                 <input
                   className="form-input"
                   type="text"
-                  value={form.nome}
-                  onChange={(e) => update('nome', e.target.value)}
+                  value={form.firstName}
+                  onChange={(e) => update('firstName', e.target.value)}
                   placeholder="Marco"
                   autoComplete="given-name"
                   required
@@ -140,8 +140,8 @@ export default function Register() {
                 <input
                   className="form-input"
                   type="text"
-                  value={form.cognome}
-                  onChange={(e) => update('cognome', e.target.value)}
+                  value={form.lastName}
+                  onChange={(e) => update('lastName', e.target.value)}
                   placeholder="Rossi"
                   autoComplete="family-name"
                   required
@@ -195,8 +195,8 @@ export default function Register() {
               <label className="form-label">Comune di residenza</label>
               <select
                 className="form-input"
-                value={form.comune}
-                onChange={(e) => update('comune', e.target.value)}
+                value={form.municipality}
+                onChange={(e) => update('municipality', e.target.value)}
                 required
               >
                 <option value="">Seleziona il comune...</option>

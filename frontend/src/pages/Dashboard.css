@@ -368,8 +368,8 @@
   color: var(--color-text-muted);
   white-space: nowrap;
 }
-.urgenza-alta { background: var(--color-primary-light); color: var(--color-primary-dark); }
-.urgenza-media { background: var(--color-amber-light); color: #92400e; }
+.urgency-high { background: var(--color-primary-light); color: var(--color-primary-dark); }
+.urgency-medium { background: var(--color-amber-light); color: #92400e; }
 
 /* ─── Consulente Card ─────────────────────────────────────────────────────────── */
 .consulente-card { padding: var(--space-5); }
@@ -616,7 +616,7 @@
 
 .pathway-card-body {
   padding: var(--space-6);
-  padding-top: 0;
+  padding-top: 20px;
   border-top: 1px solid var(--color-border-light);
 }
 

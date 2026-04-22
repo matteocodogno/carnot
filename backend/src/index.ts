@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 const app = new Hono()
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
-// Origini permesse: in produzione si aggiunge FRONTEND_URL via env var
+// Allowed origins: in production, FRONTEND_URL is added via env var
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
@@ -25,53 +25,53 @@ app.use(
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 interface QuestionnaireData {
-  tipoEdificio: string
-  annoCostruzione: string
-  superficie: string
-  riscaldamento: string
-  classeEnergetica: string
-  obiettivi: string[]
+  buildingType: string
+  yearBuilt: string
+  area: string
+  heating: string
+  energyClass: string
+  goals: string[]
 }
 
-interface Consulente {
+interface Consultant {
   id: string
-  nome: string
-  cognome: string
+  firstName: string
+  lastName: string
   email: string
-  telefono: string
-  specializzazione: string
-  disponibilita: string
-  esperienza: string
+  phone: string
+  specialization: string
+  availability: string
+  experience: string
 }
 
 interface User {
   id: string
-  nome: string
-  cognome: string
+  firstName: string
+  lastName: string
   email: string
   password: string
-  comune: string
+  municipality: string
   questionnaire?: QuestionnaireData
   createdAt: Date
-  consulente: Consulente
+  consultant: Consultant
 }
 
 interface Pathway {
   id: string
-  titolo: string
-  descrizione: string
+  title: string
+  description: string
   score: number
-  risparmioStimato: string
-  risparmioKwh: string
-  costoStimato: string
-  incentivi: string[]
-  incentivoMassimo: string
-  durata: string
-  riduzioneCO2: string
-  icona: string
-  etichetta: string
-  priorita: 'alta' | 'media' | 'bassa'
-  passi: string[]
+  estimatedSavings: string
+  savingsKwh: string
+  estimatedCost: string
+  incentives: string[]
+  maxIncentive: string
+  duration: string
+  co2Reduction: string
+  icon: string
+  label: string
+  priority: 'high' | 'medium' | 'low'
+  steps: string[]
 }
 
 // ─── IN-MEMORY STORES ────────────────────────────────────────────────────────
@@ -79,37 +79,37 @@ const users = new Map<string, User>()
 const sessions = new Map<string, string>() // token → userId
 const tempQuestionnaires = new Map<string, QuestionnaireData>() // tempToken → data
 
-// ─── CONSULENTI POOL ─────────────────────────────────────────────────────────
-const consulenti: Consulente[] = [
+// ─── CONSULTANT POOL ─────────────────────────────────────────────────────────
+const consultants: Consultant[] = [
   {
     id: 'c1',
-    nome: 'Marco',
-    cognome: 'Bernasconi',
+    firstName: 'Marco',
+    lastName: 'Bernasconi',
     email: 'm.bernasconi@arco2.ch',
-    telefono: '+41 91 123 45 67',
-    specializzazione: 'Transizione energetica residenziale',
-    disponibilita: 'Lun–Ven 8:30–17:30',
-    esperienza: '12 anni nel settore energetico ticinese',
+    phone: '+41 91 123 45 67',
+    specialization: 'Transizione energetica residenziale',
+    availability: 'Lun–Ven 8:30–17:30',
+    experience: '12 anni nel settore energetico ticinese',
   },
   {
     id: 'c2',
-    nome: 'Laura',
-    cognome: 'Fontana',
+    firstName: 'Laura',
+    lastName: 'Fontana',
     email: 'l.fontana@arco2.ch',
-    telefono: '+41 91 234 56 78',
-    specializzazione: 'Efficienza energetica e rinnovabili',
-    disponibilita: 'Lun–Gio 9:00–18:00',
-    esperienza: '8 anni, esperta CECE e incentivi cantonali',
+    phone: '+41 91 234 56 78',
+    specialization: 'Efficienza energetica e rinnovabili',
+    availability: 'Lun–Gio 9:00–18:00',
+    experience: '8 anni, esperta CECE e incentivi cantonali',
   },
   {
     id: 'c3',
-    nome: 'Andrea',
-    cognome: 'Russo',
+    firstName: 'Andrea',
+    lastName: 'Russo',
     email: 'a.russo@arco2.ch',
-    telefono: '+41 91 345 67 89',
-    specializzazione: 'Incentivi, finanziamenti e pompe di calore',
-    disponibilita: 'Mar–Sab 8:00–17:00',
-    esperienza: '10 anni, ex funzionario UACER',
+    phone: '+41 91 345 67 89',
+    specialization: 'Incentivi, finanziamenti e pompe di calore',
+    availability: 'Mar–Sab 8:00–17:00',
+    experience: '10 anni, ex funzionario UACER',
   },
 ]
 
@@ -117,165 +117,165 @@ const consulenti: Consulente[] = [
 function calculatePathways(q: QuestionnaireData): Pathway[] {
   // Initialize scores
   const scores: Record<string, number> = {
-    isolamento: 0,
-    riscaldamento: 0,
-    fotovoltaico: 0,
+    isolation: 0,
+    heating: 0,
+    photovoltaic: 0,
     vmc: 0,
-    certificazione: 0,
+    certification: 0,
   }
 
   // 1. Building age
-  if (q.annoCostruzione === 'prima_1960') {
-    scores.isolamento += 5; scores.riscaldamento += 3; scores.vmc += 2; scores.certificazione += 3
-  } else if (q.annoCostruzione === '1960_1980') {
-    scores.isolamento += 4; scores.riscaldamento += 3; scores.vmc += 1; scores.certificazione += 2
-  } else if (q.annoCostruzione === '1981_2000') {
-    scores.isolamento += 2; scores.riscaldamento += 2; scores.certificazione += 1
+  if (q.yearBuilt === 'prima_1960') {
+    scores.isolation += 5; scores.heating += 3; scores.vmc += 2; scores.certification += 3
+  } else if (q.yearBuilt === '1960_1980') {
+    scores.isolation += 4; scores.heating += 3; scores.vmc += 1; scores.certification += 2
+  } else if (q.yearBuilt === '1981_2000') {
+    scores.isolation += 2; scores.heating += 2; scores.certification += 1
   } else {
-    scores.fotovoltaico += 1
+    scores.photovoltaic += 1
   }
 
   // 2. Heating system
-  if (q.riscaldamento === 'gas_olio') {
-    scores.riscaldamento += 5; scores.fotovoltaico += 1
-  } else if (q.riscaldamento === 'elettrico') {
-    scores.fotovoltaico += 3; scores.isolamento += 1
-  } else if (q.riscaldamento === 'pellet') {
-    scores.riscaldamento += 2; scores.fotovoltaico += 2
-  } else if (q.riscaldamento === 'pompa_calore') {
-    scores.fotovoltaico += 4; scores.isolamento += 1
+  if (q.heating === 'gas_olio') {
+    scores.heating += 5; scores.photovoltaic += 1
+  } else if (q.heating === 'elettrico') {
+    scores.photovoltaic += 3; scores.isolation += 1
+  } else if (q.heating === 'pellet') {
+    scores.heating += 2; scores.photovoltaic += 2
+  } else if (q.heating === 'pompa_calore') {
+    scores.photovoltaic += 4; scores.isolation += 1
   }
 
   // 3. Energy class
-  if (q.classeEnergetica === 'gf') {
-    scores.isolamento += 4; scores.certificazione += 4; scores.vmc += 2
-  } else if (q.classeEnergetica === 'ed') {
-    scores.isolamento += 2; scores.certificazione += 3
-  } else if (q.classeEnergetica === 'cb') {
-    scores.certificazione += 1
-  } else if (q.classeEnergetica === 'non_so') {
-    scores.certificazione += 3
+  if (q.energyClass === 'gf') {
+    scores.isolation += 4; scores.certification += 4; scores.vmc += 2
+  } else if (q.energyClass === 'ed') {
+    scores.isolation += 2; scores.certification += 3
+  } else if (q.energyClass === 'cb') {
+    scores.certification += 1
+  } else if (q.energyClass === 'non_so') {
+    scores.certification += 3
   }
 
   // 4. Building type affects PV potential
-  if (q.tipoEdificio === 'unifamiliare') {
-    scores.fotovoltaico += 3
-  } else if (q.tipoEdificio === 'bifamiliare') {
-    scores.fotovoltaico += 2
-  } else if (q.tipoEdificio === 'appartamento') {
-    scores.fotovoltaico -= 1
+  if (q.buildingType === 'unifamiliare') {
+    scores.photovoltaic += 3
+  } else if (q.buildingType === 'bifamiliare') {
+    scores.photovoltaic += 2
+  } else if (q.buildingType === 'appartamento') {
+    scores.photovoltaic -= 1
   }
 
   // 5. Surface area
-  if (q.superficie === 'molto_grande') {
-    scores.fotovoltaico += 2; scores.isolamento += 1
-  } else if (q.superficie === 'grande') {
-    scores.fotovoltaico += 1
+  if (q.area === 'molto_grande') {
+    scores.photovoltaic += 2; scores.isolation += 1
+  } else if (q.area === 'grande') {
+    scores.photovoltaic += 1
   }
 
   // 6. Objectives
-  if (q.obiettivi.includes('bollette')) {
-    scores.fotovoltaico += 2; scores.isolamento += 1; scores.riscaldamento += 1
+  if (q.goals.includes('bollette')) {
+    scores.photovoltaic += 2; scores.isolation += 1; scores.heating += 1
   }
-  if (q.obiettivi.includes('co2')) {
-    scores.riscaldamento += 2; scores.fotovoltaico += 2
+  if (q.goals.includes('co2')) {
+    scores.heating += 2; scores.photovoltaic += 2
   }
-  if (q.obiettivi.includes('valore')) {
-    scores.certificazione += 3; scores.isolamento += 2
+  if (q.goals.includes('valore')) {
+    scores.certification += 3; scores.isolation += 2
   }
-  if (q.obiettivi.includes('incentivi')) {
-    scores.riscaldamento += 2; scores.isolamento += 1
+  if (q.goals.includes('incentivi')) {
+    scores.heating += 2; scores.isolation += 1
   }
-  if (q.obiettivi.includes('comfort')) {
-    scores.isolamento += 2; scores.vmc += 3
+  if (q.goals.includes('comfort')) {
+    scores.isolation += 2; scores.vmc += 3
   }
 
   // Define all pathways with enriched content
   const definitions: Pathway[] = [
     {
-      id: 'isolamento',
-      titolo: 'Risanamento energetico dell\'involucro',
-      descrizione: 'Isolamento termico di pareti, tetto e sostituzione degli infissi per eliminare le dispersioni termiche e ridurre il fabbisogno energetico dell\'edificio.',
-      score: scores.isolamento,
-      risparmioStimato: '25–40%',
-      risparmioKwh: '8.000–15.000 kWh/anno',
-      costoStimato: 'CHF 30.000 – 80.000',
-      incentivi: ['Programma Edifici (fino al 30%)', 'Deduzioni fiscali cantonali', 'MiEfficienza'],
-      incentivoMassimo: 'CHF 25.000',
-      durata: '4–8 settimane',
-      riduzioneCO2: '3–8 t CO₂/anno',
-      icona: '🏠',
-      etichetta: '',
-      priorita: 'alta',
-      passi: ['Analisi energetica dell\'edificio (CECE)', 'Scelta materiali isolanti', 'Richiesta offerte a imprese qualificate', 'Inoltro pratica incentivi', 'Lavori di risanamento'],
+      id: 'isolation',
+      title: 'Risanamento energetico dell\'involucro',
+      description: 'Isolamento termico di pareti, tetto e sostituzione degli infissi per eliminare le dispersioni termiche e ridurre il fabbisogno energetico dell\'edificio.',
+      score: scores.isolation,
+      estimatedSavings: '25–40%',
+      savingsKwh: '8.000–15.000 kWh/anno',
+      estimatedCost: 'CHF 30.000 – 80.000',
+      incentives: ['Programma Edifici (fino al 30%)', 'Deduzioni fiscali cantonali', 'MiEfficienza'],
+      maxIncentive: 'CHF 25.000',
+      duration: '4–8 settimane',
+      co2Reduction: '3–8 t CO₂/anno',
+      icon: '🏠',
+      label: '',
+      priority: 'high',
+      steps: ['Analisi energetica dell\'edificio (CECE)', 'Scelta materiali isolanti', 'Richiesta offerte a imprese qualificate', 'Inoltro pratica incentivi', 'Lavori di risanamento'],
     },
     {
-      id: 'riscaldamento',
-      titolo: 'Sostituzione impianto di riscaldamento',
-      descrizione: 'Passaggio da caldaia fossile (gas/olio) a pompa di calore ad alta efficienza, con eventuale integrazione di serbatoio d\'accumulo.',
-      score: scores.riscaldamento,
-      risparmioStimato: '30–60%',
-      risparmioKwh: '5.000–12.000 kWh/anno',
-      costoStimato: 'CHF 15.000 – 40.000',
-      incentivi: ['Programma Edifici', 'ProKilowatt', 'BancaStato mutuo verde', 'Bonus federale pompa calore'],
-      incentivoMassimo: 'CHF 18.000',
-      durata: '1–2 settimane',
-      riduzioneCO2: '4–12 t CO₂/anno',
-      icona: '🌡️',
-      etichetta: '',
-      priorita: 'alta',
-      passi: ['Verifica idoneità edificio', 'Analisi del carico termico', 'Confronto offerte installatori', 'Richiesta incentivi cantonali', 'Installazione e collaudo'],
+      id: 'heating',
+      title: 'Sostituzione impianto di riscaldamento',
+      description: 'Passaggio da caldaia fossile (gas/olio) a pompa di calore ad alta efficienza, con eventuale integrazione di serbatoio d\'accumulo.',
+      score: scores.heating,
+      estimatedSavings: '30–60%',
+      savingsKwh: '5.000–12.000 kWh/anno',
+      estimatedCost: 'CHF 15.000 – 40.000',
+      incentives: ['Programma Edifici', 'ProKilowatt', 'BancaStato mutuo verde', 'Bonus federale pompa calore'],
+      maxIncentive: 'CHF 18.000',
+      duration: '1–2 settimane',
+      co2Reduction: '4–12 t CO₂/anno',
+      icon: '🌡️',
+      label: '',
+      priority: 'high',
+      steps: ['Verifica idoneità edificio', 'Analisi del carico termico', 'Confronto offerte installatori', 'Richiesta incentivi cantonali', 'Installazione e collaudo'],
     },
     {
-      id: 'fotovoltaico',
-      titolo: 'Impianto fotovoltaico + accumulo',
-      descrizione: 'Produzione di energia elettrica rinnovabile con sistema di accumulo a batteria per massimizzare l\'autoconsumo e ridurre la dipendenza dalla rete.',
-      score: scores.fotovoltaico,
-      risparmioStimato: '20–50%',
-      risparmioKwh: '4.000–10.000 kWh/anno',
-      costoStimato: 'CHF 20.000 – 45.000',
-      incentivi: ['RIC – Rimunerazione Investimento (contributo unico)', 'Deduzione fiscale federale (investimento)', 'TicinoSolare (comune Lugano e altri)'],
-      incentivoMassimo: 'CHF 12.000',
-      durata: '2–5 giorni',
-      riduzioneCO2: '2–6 t CO₂/anno',
-      icona: '☀️',
-      etichetta: '',
-      priorita: 'media',
-      passi: ['Analisi ombreggiatura e orientamento tetto', 'Dimensionamento impianto', 'Offerta installatore accreditato', 'Richiesta allacciamento alla rete', 'Registrazione incentivi RIC'],
+      id: 'photovoltaic',
+      title: 'Impianto fotovoltaico + accumulo',
+      description: 'Produzione di energia elettrica rinnovabile con sistema di accumulo a batteria per massimizzare l\'autoconsumo e ridurre la dipendenza dalla rete.',
+      score: scores.photovoltaic,
+      estimatedSavings: '20–50%',
+      savingsKwh: '4.000–10.000 kWh/anno',
+      estimatedCost: 'CHF 20.000 – 45.000',
+      incentives: ['RIC – Rimunerazione Investimento (contributo unico)', 'Deduzione fiscale federale (investimento)', 'TicinoSolare (comune Lugano e altri)'],
+      maxIncentive: 'CHF 12.000',
+      duration: '2–5 giorni',
+      co2Reduction: '2–6 t CO₂/anno',
+      icon: '☀️',
+      label: '',
+      priority: 'medium',
+      steps: ['Analisi ombreggiatura e orientamento tetto', 'Dimensionamento impianto', 'Offerta installatore accreditato', 'Richiesta allacciamento alla rete', 'Registrazione incentivi RIC'],
     },
     {
       id: 'vmc',
-      titolo: 'Ventilazione meccanica controllata',
-      descrizione: 'Sistema di ricambio d\'aria con recupero di calore: garantisce qualità dell\'aria ottimale e riduce le perdite energetiche legate alla ventilazione naturale.',
+      title: 'Ventilazione meccanica controllata',
+      description: 'Sistema di ricambio d\'aria con recupero di calore: garantisce qualità dell\'aria ottimale e riduce le perdite energetiche legate alla ventilazione naturale.',
       score: scores.vmc,
-      risparmioStimato: '10–20%',
-      risparmioKwh: '1.500–4.000 kWh/anno',
-      costoStimato: 'CHF 8.000 – 20.000',
-      incentivi: ['Programma Edifici (complementare)', 'Deduzioni fiscali cantonali'],
-      incentivoMassimo: 'CHF 5.000',
-      durata: '1–2 settimane',
-      riduzioneCO2: '1–3 t CO₂/anno',
-      icona: '💨',
-      etichetta: '',
-      priorita: 'bassa',
-      passi: ['Analisi ricambio d\'aria attuale', 'Dimensionamento ventilazione', 'Scelta sistema (centralizzato/decentralizzato)', 'Installazione e messa in servizio'],
+      estimatedSavings: '10–20%',
+      savingsKwh: '1.500–4.000 kWh/anno',
+      estimatedCost: 'CHF 8.000 – 20.000',
+      incentives: ['Programma Edifici (complementare)', 'Deduzioni fiscali cantonali'],
+      maxIncentive: 'CHF 5.000',
+      duration: '1–2 settimane',
+      co2Reduction: '1–3 t CO₂/anno',
+      icon: '💨',
+      label: '',
+      priority: 'low',
+      steps: ['Analisi ricambio d\'aria attuale', 'Dimensionamento ventilazione', 'Scelta sistema (centralizzato/decentralizzato)', 'Installazione e messa in servizio'],
     },
     {
-      id: 'certificazione',
-      titolo: 'Certificazione energetica CECE',
-      descrizione: 'Audit energetico professionale che stabilisce la classe energetica reale dell\'edificio e definisce la roadmap ottimale di interventi con stima di costi e incentivi.',
-      score: scores.certificazione,
-      risparmioStimato: 'Analisi preliminare',
-      risparmioKwh: 'Da quantificare dopo audit',
-      costoStimato: 'CHF 800 – 2.500',
-      incentivi: ['UACER Ticino (contributo parziale audit)'],
-      incentivoMassimo: 'CHF 500',
-      durata: '1–3 giorni',
-      riduzioneCO2: 'Roadmap personalizzata',
-      icona: '📋',
-      etichetta: '',
-      priorita: 'media',
-      passi: ['Richiesta al certificatore CECE accreditato', 'Sopralluogo e raccolta dati', 'Emissione certificato energetico', 'Piano d\'azione consigliato'],
+      id: 'certification',
+      title: 'Certificazione energetica CECE',
+      description: 'Audit energetico professionale che stabilisce la classe energetica reale dell\'edificio e definisce la roadmap ottimale di interventi con stima di costi e incentivi.',
+      score: scores.certification,
+      estimatedSavings: 'Analisi preliminare',
+      savingsKwh: 'Da quantificare dopo audit',
+      estimatedCost: 'CHF 800 – 2.500',
+      incentives: ['UACER Ticino (contributo parziale audit)'],
+      maxIncentive: 'CHF 500',
+      duration: '1–3 giorni',
+      co2Reduction: 'Roadmap personalizzata',
+      icon: '📋',
+      label: '',
+      priority: 'medium',
+      steps: ['Richiesta al certificatore CECE accreditato', 'Sopralluogo e raccolta dati', 'Emissione certificato energetico', 'Piano d\'azione consigliato'],
     },
   ]
 
@@ -285,64 +285,64 @@ function calculatePathways(q: QuestionnaireData): Pathway[] {
   // Apply labels
   return definitions.map((p, i) => ({
     ...p,
-    etichetta: i === 0 ? 'Fortemente consigliato' : i === 1 ? 'Consigliato' : i === 2 ? 'Da valutare' : 'Opzionale',
-    priorita: (i === 0 ? 'alta' : i === 1 ? 'media' : 'bassa') as 'alta' | 'media' | 'bassa',
+    label: i === 0 ? 'Fortemente consigliato' : i === 1 ? 'Consigliato' : i === 2 ? 'Da valutare' : 'Opzionale',
+    priority: (i === 0 ? 'high' : i === 1 ? 'medium' : 'low') as 'high' | 'medium' | 'low',
   }))
 }
 
-// ─── STIMA DETERMINISTICA (per preview e dashboard) ──────────────────────────
-// Logica coerente con i requisiti RFP: edifici datati + fossile = alto potenziale
+// ─── DETERMINISTIC ESTIMATE (for preview and dashboard) ──────────────────────
+// Logic consistent with RFP requirements: old buildings + fossil fuel = high potential
 
 function ageFactor(q: QuestionnaireData): number {
-  // Coefficiente 0–1 per anzianità edificio
-  if (q.annoCostruzione === 'prima_1960') return 1.0
-  if (q.annoCostruzione === '1960_1980') return 0.8
-  if (q.annoCostruzione === '1981_2000') return 0.5
+  // Coefficient 0–1 for building age
+  if (q.yearBuilt === 'prima_1960') return 1.0
+  if (q.yearBuilt === '1960_1980') return 0.8
+  if (q.yearBuilt === '1981_2000') return 0.5
   return 0.2
 }
 
 function fuelFactor(q: QuestionnaireData): number {
-  if (q.riscaldamento === 'gas_olio') return 1.0
-  if (q.riscaldamento === 'pellet') return 0.5
-  if (q.riscaldamento === 'elettrico') return 0.6
-  if (q.riscaldamento === 'teleriscaldamento') return 0.3
-  return 0.2 // pompa di calore già efficiente
+  if (q.heating === 'gas_olio') return 1.0
+  if (q.heating === 'pellet') return 0.5
+  if (q.heating === 'elettrico') return 0.6
+  if (q.heating === 'teleriscaldamento') return 0.3
+  return 0.2 // heat pump already efficient
 }
 
-function classeFactor(q: QuestionnaireData): number {
-  if (q.classeEnergetica === 'gf') return 1.0
-  if (q.classeEnergetica === 'ed') return 0.7
-  if (q.classeEnergetica === 'non_so') return 0.6
-  if (q.classeEnergetica === 'cb') return 0.35
-  return 0.15 // classe A
+function energyClassFactor(q: QuestionnaireData): number {
+  if (q.energyClass === 'gf') return 1.0
+  if (q.energyClass === 'ed') return 0.7
+  if (q.energyClass === 'non_so') return 0.6
+  if (q.energyClass === 'cb') return 0.35
+  return 0.15 // class A
 }
 
 function combinedFactor(q: QuestionnaireData): number {
-  return (ageFactor(q) * 0.4 + fuelFactor(q) * 0.4 + classeFactor(q) * 0.2)
+  return (ageFactor(q) * 0.4 + fuelFactor(q) * 0.4 + energyClassFactor(q) * 0.2)
 }
 
-function estimateRisparmioMin(q: QuestionnaireData): number {
+function estimateSavingsMin(q: QuestionnaireData): number {
   return Math.round(15 + combinedFactor(q) * 25)
 }
-function estimateRisparmioMax(q: QuestionnaireData): number {
+function estimateSavingsMax(q: QuestionnaireData): number {
   return Math.round(30 + combinedFactor(q) * 40)
 }
-function estimateCO2Min(q: QuestionnaireData): number {
-  const base = q.superficie === 'molto_grande' ? 8 : q.superficie === 'grande' ? 6 : q.superficie === 'media' ? 4 : 2
+function estimateCo2Min(q: QuestionnaireData): number {
+  const base = q.area === 'molto_grande' ? 8 : q.area === 'grande' ? 6 : q.area === 'media' ? 4 : 2
   return Math.round(base * (0.4 + combinedFactor(q) * 0.6))
 }
-function estimateCO2Max(q: QuestionnaireData): number {
-  const base = q.superficie === 'molto_grande' ? 22 : q.superficie === 'grande' ? 16 : q.superficie === 'media' ? 12 : 7
+function estimateCo2Max(q: QuestionnaireData): number {
+  const base = q.area === 'molto_grande' ? 22 : q.area === 'grande' ? 16 : q.area === 'media' ? 12 : 7
   return Math.round(base * (0.4 + combinedFactor(q) * 0.6))
 }
-function estimateIncentiviMin(q: QuestionnaireData): number {
-  // Incentivo minimo: certificazione CECE sempre accessibile
+function estimateIncentivesMin(q: QuestionnaireData): number {
+  // Minimum incentive: CECE certification always accessible
   const base = 5000
-  const bonus = q.riscaldamento === 'gas_olio' ? 8000 : 3000
+  const bonus = q.heating === 'gas_olio' ? 8000 : 3000
   return base + bonus
 }
-function estimateIncentiviMax(q: QuestionnaireData): number {
-  // Incentivo massimo: cumulando Programma Edifici + ProKilowatt + RIC
+function estimateIncentivesMax(q: QuestionnaireData): number {
+  // Maximum incentive: cumulating Building Program + ProKilowatt + RIC
   const base = 18000
   const ageBon = ageFactor(q) > 0.7 ? 15000 : 8000
   const fuelBon = fuelFactor(q) > 0.7 ? 12000 : 5000
@@ -375,35 +375,35 @@ app.post('/api/questionnaire', async (c) => {
   // Auto-expire after 30 min
   setTimeout(() => tempQuestionnaires.delete(tempToken), 30 * 60 * 1000)
 
-  // ── Stima deterministica risparmio / CO₂ / incentivi ──────────────────────
-  // Basata sui fattori chiave dell'RFP (anno, riscaldamento, classe)
-  const risparmioMin = estimateRisparmioMin(body)
-  const risparmioMax = estimateRisparmioMax(body)
-  const co2Min = estimateCO2Min(body)
-  const co2Max = estimateCO2Max(body)
-  const incMin = estimateIncentiviMin(body)
-  const incMax = estimateIncentiviMax(body)
+  // ── Deterministic estimate savings / CO₂ / incentives ──────────────────────
+  // Based on RFP key factors (year, heating, class)
+  const savingsMin = estimateSavingsMin(body)
+  const savingsMax = estimateSavingsMax(body)
+  const co2Min = estimateCo2Min(body)
+  const co2Max = estimateCo2Max(body)
+  const incMin = estimateIncentivesMin(body)
+  const incMax = estimateIncentivesMax(body)
 
   return c.json({
     success: true,
     tempToken,
     preview: {
-      percorsiCount: pathways.length,
-      topPercorso: pathways[0].titolo,
-      secondPercorso: pathways[1]?.titolo,
-      risparmioTotale: `${risparmioMin}–${risparmioMax}%`,
-      riduzioneCO2: `${co2Min}–${co2Max} t CO₂/anno`,
-      incentiviDisponibili: `CHF ${incMin.toLocaleString('it-CH')} – ${incMax.toLocaleString('it-CH')}`,
-      // pathwaysBlurred è DENTRO preview così setPreview(data.preview) lo include
-      pathwaysBlurred: pathways.map((p, i) => ({
+      pathwayCount: pathways.length,
+      topPathway: pathways[0].title,
+      secondPathway: pathways[1]?.title,
+      totalSavings: `${savingsMin}–${savingsMax}%`,
+      co2Reduction: `${co2Min}–${co2Max} t CO₂/anno`,
+      availableIncentives: `CHF ${incMin.toLocaleString('it-CH')} – ${incMax.toLocaleString('it-CH')}`,
+      // pathways is INSIDE preview so setPreview(data.preview) includes it
+      pathways: pathways.map((p, i) => ({
         id: p.id,
-        titolo: p.titolo,          // tutti visibili in anteprima
-        risparmioStimato: p.risparmioStimato,
-        riduzioneCO2: p.riduzioneCO2,
-        etichetta: p.etichetta,
-        priorita: p.priorita,
-        icona: p.icona,
-        visible: i < 2,            // dettagli completi solo per i top 2
+        title: p.title,          // all visible in preview
+        estimatedSavings: p.estimatedSavings,
+        co2Reduction: p.co2Reduction,
+        label: p.label,
+        priority: p.priority,
+        icon: p.icon,
+        visible: i < 2,            // full details only for top 2
       })),
     },
   })
@@ -412,12 +412,12 @@ app.post('/api/questionnaire', async (c) => {
 // Register new user
 app.post('/api/register', async (c) => {
   const body = await c.req.json()
-  const { nome, cognome, email, password, comune, tempToken } = body as {
-    nome: string; cognome: string; email: string
-    password: string; comune: string; tempToken?: string
+  const { firstName, lastName, email, password, municipality, tempToken } = body as {
+    firstName: string; lastName: string; email: string
+    password: string; municipality: string; tempToken?: string
   }
 
-  if (!nome || !cognome || !email || !password || !comune) {
+  if (!firstName || !lastName || !email || !password || !municipality) {
     return c.json({ error: 'Tutti i campi sono obbligatori' }, 400)
   }
 
@@ -435,15 +435,15 @@ app.post('/api/register', async (c) => {
     if (questionnaireData) tempQuestionnaires.delete(tempToken)
   }
 
-  // Assign consulente round-robin
-  const consulente = consulenti[users.size % consulenti.length]
+  // Assign consultant round-robin
+  const consultant = consultants[users.size % consultants.length]
 
   const userId = uuidv4()
   const user: User = {
-    id: userId, nome, cognome, email, password, comune,
+    id: userId, firstName, lastName, email, password, municipality,
     questionnaire: questionnaireData,
     createdAt: new Date(),
-    consulente,
+    consultant,
   }
   users.set(userId, user)
 
@@ -474,85 +474,85 @@ app.get('/api/dashboard', (c) => {
   // For demo: fall back to a representative default questionnaire so the
   // dashboard always renders fully even without a completed questionnaire.
   const DEFAULT_QUESTIONNAIRE: QuestionnaireData = {
-    tipoEdificio: 'unifamiliare',
-    annoCostruzione: '1960_1980',
-    superficie: 'media',
-    riscaldamento: 'gas_olio',
-    classeEnergetica: 'gf',
-    obiettivi: ['bollette', 'co2', 'incentivi'],
+    buildingType: 'unifamiliare',
+    yearBuilt: '1960_1980',
+    area: 'media',
+    heating: 'gas_olio',
+    energyClass: 'gf',
+    goals: ['bollette', 'co2', 'incentivi'],
   }
   const q = user.questionnaire ?? DEFAULT_QUESTIONNAIRE
-  let percorsi: Pathway[] = []
-  let dossierEdificio = null
+  let pathways: Pathway[] = []
+  let buildingDossier = null
 
   if (q) {
-    percorsi = calculatePathways(q)
+    pathways = calculatePathways(q)
 
     const labels: Record<string, Record<string, string>> = {
-      tipoEdificio: {
+      buildingType: {
         unifamiliare: 'Casa unifamiliare', bifamiliare: 'Casa bifamiliare',
         appartamento: 'Appartamento in condominio', altro: 'Altro',
       },
-      annoCostruzione: {
+      yearBuilt: {
         prima_1960: 'Prima del 1960', '1960_1980': '1960 – 1980',
         '1981_2000': '1981 – 2000', dopo_2000: 'Dopo il 2000',
       },
-      superficie: {
+      area: {
         piccola: '< 80 m²', media: '80 – 150 m²',
         grande: '150 – 250 m²', molto_grande: '> 250 m²',
       },
-      riscaldamento: {
+      heating: {
         gas_olio: 'Caldaia a gas/olio', pompa_calore: 'Pompa di calore',
         teleriscaldamento: 'Teleriscaldamento', elettrico: 'Riscaldamento elettrico',
         pellet: 'Stufa a pellet/legna',
       },
-      classeEnergetica: {
+      energyClass: {
         non_so: 'Non specificata', gf: 'G / F — classe bassa',
         ed: 'E / D — classe media', cb: 'C / B — classe medio-alta', a: 'A — classe alta',
       },
     }
 
-    const obiettiviLabels: Record<string, string> = {
+    const goalsLabels: Record<string, string> = {
       bollette: 'Ridurre le bollette', comfort: 'Aumentare il comfort',
       valore: 'Valorizzare l\'immobile', incentivi: 'Accedere a incentivi',
       co2: 'Ridurre le emissioni CO₂',
     }
 
-    dossierEdificio = {
-      tipo: labels.tipoEdificio[q.tipoEdificio] ?? q.tipoEdificio,
-      anno: labels.annoCostruzione[q.annoCostruzione] ?? q.annoCostruzione,
-      superficie: labels.superficie[q.superficie] ?? q.superficie,
-      riscaldamento: labels.riscaldamento[q.riscaldamento] ?? q.riscaldamento,
-      classeEnergetica: labels.classeEnergetica[q.classeEnergetica] ?? q.classeEnergetica,
-      obiettivi: (q.obiettivi ?? []).map((o) => obiettiviLabels[o] ?? o),
-      completamento: 25,
-      indirizzo: null,
-      comune: user.comune,
+    buildingDossier = {
+      type: labels.buildingType[q.buildingType] ?? q.buildingType,
+      year: labels.yearBuilt[q.yearBuilt] ?? q.yearBuilt,
+      area: labels.area[q.area] ?? q.area,
+      heating: labels.heating[q.heating] ?? q.heating,
+      energyClass: labels.energyClass[q.energyClass] ?? q.energyClass,
+      goals: (q.goals ?? []).map((o) => goalsLabels[o] ?? o),
+      completion: 25,
+      address: null,
+      municipality: user.municipality,
     }
   }
 
   return c.json({
-    user: { id: user.id, nome: user.nome, cognome: user.cognome, email: user.email, comune: user.comune },
-    consulente: user.consulente,
-    dossierEdificio,
-    percorsi,
-    prossimiPassi: [
-      { id: 1, titolo: 'Completa il dossier edificio', descrizione: 'Inserisci indirizzo e dati tecnici completi per sbloccare l\'analisi avanzata', modulo: 2, stato: 'da_fare', urgenza: 'alta' },
-      { id: 2, titolo: `Primo contatto con ${user.consulente.nome} ${user.consulente.cognome}`, descrizione: 'Il tuo consulente arCO₂ ti contatterà per fissare una chiamata conoscitiva gratuita', modulo: 3, stato: 'attesa', urgenza: 'media' },
-      { id: 3, titolo: 'Ricevi i tuoi preventivi', descrizione: 'Una volta completato il dossier, potrai richiedere preventivi ai professionisti del territorio', modulo: 4, stato: 'bloccato', urgenza: 'bassa' },
+    user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, municipality: user.municipality },
+    consultant: user.consultant,
+    buildingDossier,
+    pathways,
+    nextSteps: [
+      { id: 1, title: 'Completa il dossier edificio', description: 'Inserisci indirizzo e dati tecnici completi per sbloccare l\'analisi avanzata', module: 2, status: 'todo', urgency: 'high' },
+      { id: 2, title: `Primo contatto con ${user.consultant.firstName} ${user.consultant.lastName}`, description: 'Il tuo consulente arCO₂ ti contatterà per fissare una chiamata conoscitiva gratuita', module: 3, status: 'waiting', urgency: 'medium' },
+      { id: 3, title: 'Ricevi i tuoi preventivi', description: 'Una volta completato il dossier, potrai richiedere preventivi ai professionisti del territorio', module: 4, status: 'locked', urgency: 'low' },
     ],
-    statistiche: {
-      risparmioPotenziale: '35–55%',
-      riduzioneCO2: '5–15 t CO₂/anno',
-      incentiviDisponibili: 'CHF 10.000 – 43.000',
-      tempoStimato: '3–6 mesi',
+    statistics: {
+      potentialSavings: '35–55%',
+      co2Reduction: '5–15 t CO₂/anno',
+      availableIncentives: 'CHF 10.000 – 43.000',
+      estimatedTime: '3–6 mesi',
     },
-    progressoGlobale: 10, // % completamento percorso totale
+    globalProgress: 10, // % completion of overall journey
   })
 })
 
 // ─── START ───────────────────────────────────────────────────────────────────
-// Railway inietta PORT automaticamente; fallback a 3001 in locale
+// Railway injects PORT automatically; fallback to 3001 locally
 const port = parseInt(process.env.PORT ?? '3001')
 
 serve({ fetch: app.fetch, port, hostname: '0.0.0.0' }, (info) => {
