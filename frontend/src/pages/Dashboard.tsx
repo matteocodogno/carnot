@@ -528,8 +528,8 @@ function PathwayCard({ pathway, rank, expanded, onToggle }: {
             </div>
           </div>
           <div className="pathway-actions">
-            <button className="btn btn-primary">
-              Attiva questo percorso →
+            <button className="btn btn-primary" onClick={() => navigate(`/percorso/${pathway.id}`)}>
+              Apri dettaglio completo →
             </button>
             <button className="btn btn-secondary">
               Richiedi preventivi professionisti

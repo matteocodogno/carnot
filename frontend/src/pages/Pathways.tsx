@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../App'
+import PublicNav from '../components/PublicNav'
 import './Pathways.css'
 
 interface PathwayCard {
@@ -134,35 +135,7 @@ export default function Pathways() {
 
   return (
     <div className="pathways-page">
-      {/* ─── Nav ──────────────────────────────────────────────────────────── */}
-      <header className="pathways-nav">
-        <div className="nav-container">
-          <button className="nav-logo" onClick={() => navigate('/')} style={{ background: 'none', border: 'none' }}>
-            <span className="logo-mark">arCO</span>
-            <span className="logo-sub">₂</span>
-          </button>
-          <nav className="nav-links">
-            <button className="nav-link-btn" onClick={() => navigate('/')}>Home</button>
-            <span className="nav-link-active">Percorsi</span>
-          </nav>
-          <div className="nav-cta">
-            {token ? (
-              <button className="btn btn-primary btn-sm" onClick={() => navigate('/dashboard')}>
-                Vai alla dashboard →
-              </button>
-            ) : (
-              <>
-                <button className="btn btn-ghost btn-sm" onClick={() => navigate('/accedi')}>
-                  Accedi
-                </button>
-                <button className="btn btn-secondary btn-sm" onClick={() => navigate('/questionario')}>
-                  Inizia ora
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <PublicNav />
 
       {/* ─── Hero ─────────────────────────────────────────────────────────── */}
       <section className="pathways-hero">

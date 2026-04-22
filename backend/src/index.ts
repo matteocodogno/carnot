@@ -44,6 +44,8 @@ interface Consultant {
   experience: string
 }
 
+type UserStatus = 'new' | 'questionnaire_done' | 'consultant_assigned' | 'in_progress' | 'completed'
+
 interface User {
   id: string
   firstName: string
@@ -54,6 +56,8 @@ interface User {
   questionnaire?: QuestionnaireData
   createdAt: Date
   consultant: Consultant
+  status: UserStatus
+  adminNote?: string
 }
 
 interface Pathway {
@@ -78,6 +82,11 @@ interface Pathway {
 const users = new Map<string, User>()
 const sessions = new Map<string, string>() // token → userId
 const tempQuestionnaires = new Map<string, QuestionnaireData>() // tempToken → data
+const adminSessions = new Set<string>() // admin tokens
+
+// ─── ADMIN CREDENTIALS (hardcoded for demo) ───────────────────────────────────
+const ADMIN_EMAIL = 'admin@ticinoenergia.ch'
+const ADMIN_PASSWORD = 'arco2admin'
 
 // ─── CONSULTANT POOL ─────────────────────────────────────────────────────────
 const consultants: Consultant[] = [
@@ -349,13 +358,19 @@ function estimateIncentivesMax(q: QuestionnaireData): number {
   return base + ageBon + fuelBon
 }
 
-// ─── HELPER: GET AUTH USER ────────────────────────────────────────────────────
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
 function getAuthUser(authHeader: string | undefined): User | null {
   const token = authHeader?.replace('Bearer ', '')
   if (!token) return null
   const userId = sessions.get(token)
   if (!userId) return null
   return users.get(userId) ?? null
+}
+
+function getAdminAuth(authHeader: string | undefined): boolean {
+  const token = authHeader?.replace('Bearer ', '')
+  if (!token) return false
+  return adminSessions.has(token)
 }
 
 // ─── ROUTES ──────────────────────────────────────────────────────────────────
@@ -444,6 +459,7 @@ app.post('/api/register', async (c) => {
     questionnaire: questionnaireData,
     createdAt: new Date(),
     consultant,
+    status: questionnaireData ? 'questionnaire_done' : 'new',
   }
   users.set(userId, user)
 
@@ -548,6 +564,97 @@ app.get('/api/dashboard', (c) => {
       estimatedTime: '3–6 mesi',
     },
     globalProgress: 10, // % completion of overall journey
+  })
+})
+
+// ─── ADMIN ROUTES ────────────────────────────────────────────────────────────
+
+app.post('/api/admin/login', async (c) => {
+  const { email, password } = (await c.req.json()) as { email: string; password: string }
+  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    const token = uuidv4()
+    adminSessions.add(token)
+    return c.json({ success: true, token })
+  }
+  return c.json({ error: 'Credenziali non valide' }, 401)
+})
+
+app.get('/api/admin/stats', (c) => {
+  if (!getAdminAuth(c.req.header('Authorization'))) return c.json({ error: 'Non autorizzato' }, 401)
+  const all = Array.from(users.values())
+  return c.json({
+    totalUsers: all.length,
+    withQuestionnaire: all.filter((u) => !!u.questionnaire).length,
+    byStatus: {
+      new: all.filter((u) => u.status === 'new').length,
+      questionnaire_done: all.filter((u) => u.status === 'questionnaire_done').length,
+      consultant_assigned: all.filter((u) => u.status === 'consultant_assigned').length,
+      in_progress: all.filter((u) => u.status === 'in_progress').length,
+      completed: all.filter((u) => u.status === 'completed').length,
+    },
+    consultants: consultants.map((c) => ({
+      ...c,
+      assignedCount: all.filter((u) => u.consultant.id === c.id).length,
+    })),
+  })
+})
+
+app.get('/api/admin/users', (c) => {
+  if (!getAdminAuth(c.req.header('Authorization'))) return c.json({ error: 'Non autorizzato' }, 401)
+  const list = Array.from(users.values()).map((u) => ({
+    id: u.id,
+    firstName: u.firstName,
+    lastName: u.lastName,
+    email: u.email,
+    municipality: u.municipality,
+    status: u.status,
+    adminNote: u.adminNote ?? '',
+    createdAt: u.createdAt,
+    hasQuestionnaire: !!u.questionnaire,
+    consultant: u.consultant,
+    questionnaire: u.questionnaire ?? null,
+  }))
+  // Most recent first
+  list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  return c.json({ users: list, total: list.length })
+})
+
+app.patch('/api/admin/users/:id', async (c) => {
+  if (!getAdminAuth(c.req.header('Authorization'))) return c.json({ error: 'Non autorizzato' }, 401)
+  const userId = c.req.param('id')
+  const user = users.get(userId)
+  if (!user) return c.json({ error: 'Utente non trovato' }, 404)
+  const body = await c.req.json() as { status?: UserStatus; consultantId?: string; adminNote?: string }
+  if (body.status) user.status = body.status
+  if (body.adminNote !== undefined) user.adminNote = body.adminNote
+  if (body.consultantId) {
+    const found = consultants.find((con) => con.id === body.consultantId)
+    if (found) user.consultant = found
+  }
+  users.set(userId, user)
+  return c.json({ success: true })
+})
+
+// ─── PATHWAY DETAIL (user auth) ───────────────────────────────────────────────
+
+app.get('/api/pathway/:pathwayId', (c) => {
+  const user = getAuthUser(c.req.header('Authorization'))
+  if (!user) return c.json({ error: 'Non autorizzato' }, 401)
+  const pathwayId = c.req.param('pathwayId')
+  const DEFAULT_QUESTIONNAIRE: QuestionnaireData = {
+    buildingType: 'unifamiliare', yearBuilt: '1960_1980',
+    area: 'media', heating: 'gas_olio', energyClass: 'gf',
+    goals: ['bollette', 'co2', 'incentivi'],
+  }
+  const q = user.questionnaire ?? DEFAULT_QUESTIONNAIRE
+  const pathways = calculatePathways(q)
+  const pathway = pathways.find((p) => p.id === pathwayId)
+  if (!pathway) return c.json({ error: 'Percorso non trovato' }, 404)
+  return c.json({
+    pathway,
+    user: { firstName: user.firstName, lastName: user.lastName, municipality: user.municipality },
+    consultant: user.consultant,
+    questionnaire: q,
   })
 })
 
