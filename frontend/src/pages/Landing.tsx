@@ -35,7 +35,7 @@ export default function Landing() {
           <nav className="nav-links">
             <a href="#come-funziona">Come funziona</a>
             <button className="nav-link-page-btn" onClick={() => navigate('/percorsi')}>Percorsi</button>
-            <a href="#faq">FAQ</a>
+            <button className="nav-link-page-btn" onClick={() => navigate('/faq')}>FAQ</button>
           </nav>
           <div className="nav-cta">
             {token ? (
