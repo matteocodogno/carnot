@@ -68,10 +68,15 @@ export default function Dashboard() {
     <div className="dashboard">
       {/* ─── Sidebar ──────────────────────────────────────────────────── */}
       <aside className="sidebar">
-        <div className="sidebar-logo">
+        <button
+          className="sidebar-logo"
+          onClick={() => navigate('/')}
+          title="Torna alla home"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'left' }}
+        >
           <span className="logo-mark">arCO</span>
           <span className="logo-sub">₂</span>
-        </div>
+        </button>
 
         <nav className="sidebar-nav">
           {NAV_ITEMS.map((item) => (

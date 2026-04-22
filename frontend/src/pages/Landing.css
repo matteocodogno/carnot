@@ -39,6 +39,12 @@
   display: flex;
   gap: var(--space-8);
 }
+
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
 .nav-links a {
   font-family: var(--font-sans);
   font-size: 14px;
@@ -165,7 +171,6 @@
 
 .hero-building {
   width: 220px;
-  filter: drop-shadow(0 8px 24px rgba(27,107,119,0.15));
 }
 
 .building-svg { width: 100%; height: auto; }
