@@ -1,0 +1,162 @@
+/* ─── Login page ──────────────────────────────────────────────────────────── */
+.login-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* ─── Left panel ──────────────────────────────────────────────────────────── */
+.login-left {
+  background: linear-gradient(150deg, var(--color-primary) 0%, var(--color-teal) 100%);
+  padding: var(--space-10) var(--space-12);
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+.login-left .nav-logo {
+  cursor: pointer;
+}
+
+.login-left .logo-mark { color: white; }
+.login-left .logo-sub  { color: rgba(255,255,255,0.75); }
+
+.login-left-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+.login-hero-title {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 800;
+  color: white;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: var(--space-5);
+}
+
+.login-hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.65;
+  max-width: 400px;
+  margin-bottom: var(--space-8);
+}
+
+.login-perks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.login-perk {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 15px;
+  color: rgba(255,255,255,0.9);
+}
+
+.login-perk .perk-icon { font-size: 18px; flex-shrink: 0; }
+
+/* ─── Right panel ─────────────────────────────────────────────────────────── */
+.login-right {
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-10) var(--space-8);
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-form-header {
+  margin-bottom: var(--space-8);
+}
+
+.login-form-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: var(--space-1);
+}
+
+.login-form-header p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* ─── Form ────────────────────────────────────────────────────────────────── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.login-forgot {
+  font-size: 12px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+.login-forgot:hover { text-decoration: underline; }
+
+/* ─── Error ───────────────────────────────────────────────────────────────── */
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: #dc2626;
+}
+
+/* ─── Divider ─────────────────────────────────────────────────────────────── */
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* ─── Register link ───────────────────────────────────────────────────────── */
+.login-register-link {
+  margin-top: var(--space-5);
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.login-register-link a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-register-link a:hover { text-decoration: underline; }
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .login-page { grid-template-columns: 1fr; }
+  .login-left  { display: none; }
+  .login-right { padding: var(--space-8) var(--space-5); }
+}

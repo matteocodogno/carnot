@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing'
+import Login from './pages/Login'
 import Questionnaire from './pages/Questionnaire'
 import PreviewResults from './pages/PreviewResults'
 import Register from './pages/Register'
@@ -79,6 +80,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/accedi" element={<Login />} />
             <Route path="/questionario" element={<Questionnaire />} />
             <Route path="/anteprima" element={<PreviewResults />} />
             <Route path="/registrati" element={<Register />} />

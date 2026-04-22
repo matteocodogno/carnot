@@ -43,9 +43,14 @@ export default function Landing() {
                 Vai alla dashboard →
               </button>
             ) : (
-              <button className="btn btn-secondary btn-sm" onClick={() => navigate('/questionario')}>
-                Inizia ora
-              </button>
+              <>
+                <button className="btn btn-ghost btn-sm" onClick={() => navigate('/accedi')}>
+                  Accedi
+                </button>
+                <button className="btn btn-secondary btn-sm" onClick={() => navigate('/questionario')}>
+                  Inizia ora
+                </button>
+              </>
             )}
           </div>
         </div>
