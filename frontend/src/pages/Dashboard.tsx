@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [error, setError] = useState('')
   const [activeSection, setActiveSection] = useState<NavSection>('overview')
   const [expandedPathway, setExpandedPathway] = useState<string | null>(null)
+  const [progressMounted, setProgressMounted] = useState(false)
 
   useEffect(() => {
     async function fetchDashboard() {
@@ -35,6 +36,8 @@ export default function Dashboard() {
         if (!res.ok) throw new Error('Errore caricamento dati')
         const json: DashboardData = await res.json()
         setData(json)
+        // Trigger progress bar animation after render
+        setTimeout(() => setProgressMounted(true), 80)
       } catch {
         setError('Impossibile caricare la dashboard. Riprova.')
       } finally {
@@ -44,12 +47,7 @@ export default function Dashboard() {
     fetchDashboard()
   }, [token])
 
-  if (loading) return (
-    <div className="dashboard-loading">
-      <div className="loading-spinner-lg"></div>
-      <p>Caricamento del tuo dossier…</p>
-    </div>
-  )
+  if (loading) return <DashboardSkeleton />
 
   if (error || !data) return (
     <div className="dashboard-error">
@@ -97,7 +95,7 @@ export default function Dashboard() {
             <strong>{globalProgress}%</strong>
           </div>
           <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${globalProgress}%` }}></div>
+            <div className="progress-fill" style={{ width: progressMounted ? `${globalProgress}%` : '0%' }}></div>
           </div>
           <p className="sidebar-progress-note">Modulo 1 completato · 9 moduli rimanenti</p>
         </div>
@@ -216,7 +214,7 @@ export default function Dashboard() {
               {/* Right column */}
               <div className="panoramica-side">
                 <ConsultantCard consultant={consultant} consInitials={consInitials} compact />
-                {buildingDossier && <DossierMiniCard dossier={buildingDossier} onClick={() => setActiveSection('dossier')} />}
+                {buildingDossier && <DossierMiniCard dossier={buildingDossier} onClick={() => setActiveSection('dossier')} progressMounted={progressMounted} />}
               </div>
             </div>
           </div>
@@ -238,7 +236,7 @@ export default function Dashboard() {
                     <div className="dc-percent">{buildingDossier.completion}%</div>
                   </div>
                   <div className="progress-track" style={{ marginTop: 'var(--space-3)' }}>
-                    <div className="progress-fill" style={{ width: `${buildingDossier.completion}%` }}></div>
+                    <div className="progress-fill" style={{ width: progressMounted ? `${buildingDossier.completion}%` : '0%' }}></div>
                   </div>
                   <div className="dc-modules">
                     <DossierModule num={1} label="Orientamento iniziale" done />
@@ -442,7 +440,7 @@ function ConsultantCard({ consultant, consInitials, compact = false, full = fals
   )
 }
 
-function DossierMiniCard({ dossier, onClick }: { dossier: DashboardData['buildingDossier']; onClick: () => void }) {
+function DossierMiniCard({ dossier, onClick, progressMounted }: { dossier: DashboardData['buildingDossier']; onClick: () => void; progressMounted: boolean }) {
   if (!dossier) return null
   return (
     <div className="dossier-mini-card card" onClick={onClick} style={{ cursor: 'pointer' }}>
@@ -457,7 +455,7 @@ function DossierMiniCard({ dossier, onClick }: { dossier: DashboardData['buildin
         <span className="dmc-item">{dossier.heating}</span>
       </div>
       <div className="progress-track" style={{ marginTop: 'var(--space-3)' }}>
-        <div className="progress-fill" style={{ width: `${dossier.completion}%` }}></div>
+        <div className="progress-fill" style={{ width: progressMounted ? `${dossier.completion}%` : '0%' }}></div>
       </div>
       <p className="dmc-cta">Completa il dossier →</p>
     </div>
@@ -467,6 +465,7 @@ function DossierMiniCard({ dossier, onClick }: { dossier: DashboardData['buildin
 function PathwayCard({ pathway, rank, expanded, onToggle }: {
   pathway: Pathway; rank: number; expanded: boolean; onToggle: () => void
 }) {
+  const navigate = useNavigate()
   const badgeClass = pathway.priority === 'high' ? 'badge-high' : pathway.priority === 'medium' ? 'badge-medium' : 'badge-low'
 
   return (
@@ -496,50 +495,48 @@ function PathwayCard({ pathway, rank, expanded, onToggle }: {
         <span className="pathway-expand-icon">{expanded ? '▲' : '▼'}</span>
       </div>
 
-      {expanded && (
-        <div className="pathway-card-body fade-in">
-          <div className="pathway-detail-grid">
-            <div className="pathway-detail-section">
-              <h4>📊 Dati tecnici</h4>
-              <div className="pathway-detail-rows">
-                <div className="pdr"><span>Risparmio energetico</span><strong>{pathway.savingsKwh}</strong></div>
-                <div className="pdr"><span>Riduzione CO₂</span><strong>{pathway.co2Reduction}</strong></div>
-                <div className="pdr"><span>Durata lavori</span><strong>{pathway.duration}</strong></div>
-                <div className="pdr"><span>Costo stimato</span><strong>{pathway.estimatedCost}</strong></div>
-                <div className="pdr"><span>Incentivo massimo</span><strong style={{ color: 'var(--color-green)' }}>{pathway.maxIncentive}</strong></div>
-              </div>
-            </div>
-            <div className="pathway-detail-section">
-              <h4>💶 Incentivi applicabili</h4>
-              <div className="pathway-incentivi-list">
-                {pathway.incentives.map((inc) => (
-                  <div key={inc} className="inc-row">
-                    <span className="inc-dot"></span>
-                    <span>{inc}</span>
-                  </div>
-                ))}
-              </div>
-              <h4 style={{ marginTop: 'var(--space-5)' }}>🗺️ Passi del percorso</h4>
-              <ol className="pathway-steps-list">
-                {pathway.steps.map((step, i) => (
-                  <li key={i}>{step}</li>
-                ))}
-              </ol>
+      <div className={`pathway-card-body${expanded ? ' pathway-card-body-open' : ''}`}>
+        <div className="pathway-detail-grid">
+          <div className="pathway-detail-section">
+            <h4>📊 Dati tecnici</h4>
+            <div className="pathway-detail-rows">
+              <div className="pdr"><span>Risparmio energetico</span><strong>{pathway.savingsKwh}</strong></div>
+              <div className="pdr"><span>Riduzione CO₂</span><strong>{pathway.co2Reduction}</strong></div>
+              <div className="pdr"><span>Durata lavori</span><strong>{pathway.duration}</strong></div>
+              <div className="pdr"><span>Costo stimato</span><strong>{pathway.estimatedCost}</strong></div>
+              <div className="pdr"><span>Incentivo massimo</span><strong style={{ color: 'var(--color-green)' }}>{pathway.maxIncentive}</strong></div>
             </div>
           </div>
-          <div className="pathway-actions">
-            <button className="btn btn-primary" onClick={() => navigate(`/percorso/${pathway.id}`)}>
-              Apri dettaglio completo →
-            </button>
-            <button className="btn btn-secondary">
-              Richiedi preventivi professionisti
-            </button>
-            <button className="btn btn-ghost">
-              Salva per dopo
-            </button>
+          <div className="pathway-detail-section">
+            <h4>💶 Incentivi applicabili</h4>
+            <div className="pathway-incentivi-list">
+              {pathway.incentives.map((inc) => (
+                <div key={inc} className="inc-row">
+                  <span className="inc-dot"></span>
+                  <span>{inc}</span>
+                </div>
+              ))}
+            </div>
+            <h4 style={{ marginTop: 'var(--space-5)' }}>🗺️ Passi del percorso</h4>
+            <ol className="pathway-steps-list">
+              {pathway.steps.map((step, i) => (
+                <li key={i}>{step}</li>
+              ))}
+            </ol>
           </div>
         </div>
-      )}
+        <div className="pathway-actions">
+          <button className="btn btn-primary" onClick={() => navigate(`/percorso/${pathway.id}`)}>
+            Apri dettaglio completo →
+          </button>
+          <button className="btn btn-secondary">
+            Richiedi preventivi professionisti
+          </button>
+          <button className="btn btn-ghost">
+            Salva per dopo
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -565,6 +562,70 @@ function DossierModule({ num, label, done = false, active = false, locked = fals
     <div className={`dossier-module ${cls}`}>
       <span>{icon}</span>
       <span>M{num} {label}</span>
+    </div>
+  )
+}
+
+// ─── Skeleton loading screen ─────────────────────────────────────────────────
+
+function DashboardSkeleton() {
+  return (
+    <div className="dashboard">
+      {/* Skeleton sidebar */}
+      <aside className="sidebar">
+        <div className="skeleton sk-logo"></div>
+        <nav className="sidebar-nav">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="sk-nav-item">
+              <div className="skeleton sk-nav-icon"></div>
+              <div className="skeleton sk-nav-label"></div>
+            </div>
+          ))}
+        </nav>
+        <div className="sidebar-progress" style={{ marginTop: 'auto' }}>
+          <div className="skeleton skeleton-text" style={{ width: '70%', marginBottom: 8 }}></div>
+          <div className="skeleton sk-progress-bar"></div>
+          <div className="skeleton skeleton-text-sm" style={{ width: '90%', marginTop: 8 }}></div>
+        </div>
+      </aside>
+
+      {/* Skeleton main */}
+      <div className="dashboard-main">
+        <header className="dashboard-topbar">
+          <div className="skeleton sk-topbar-title"></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div className="skeleton sk-topbar-avatar"></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div className="skeleton skeleton-text" style={{ width: 100 }}></div>
+              <div className="skeleton skeleton-text-sm" style={{ width: 70 }}></div>
+            </div>
+          </div>
+        </header>
+
+        <div className="dashboard-content">
+          {/* Banner */}
+          <div className="skeleton sk-banner"></div>
+
+          {/* Stats row */}
+          <div className="stats-grid">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="skeleton sk-stat card"></div>
+            ))}
+          </div>
+
+          {/* Main grid */}
+          <div className="panoramica-grid">
+            <div className="panoramica-main">
+              <div className="skeleton sk-card-tall card"></div>
+              <div className="skeleton sk-card-medium card"></div>
+            </div>
+            <div className="panoramica-side">
+              <div className="skeleton sk-card-medium card"></div>
+              <div className="skeleton" style={{ height: 160, borderRadius: 'var(--radius-lg)' }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

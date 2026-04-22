@@ -1,3 +1,61 @@
+/* ─── Keyframes ───────────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes progress-fill-in {
+  from { width: 0%; }
+}
+
+/* ─── Skeleton base ───────────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg,
+    #e8edf2 25%,
+    #f5f7fa 50%,
+    #e8edf2 75%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text  { height: 14px; border-radius: 4px; }
+.skeleton-text-sm { height: 11px; border-radius: 4px; }
+.skeleton-text-lg { height: 20px; border-radius: 4px; }
+.skeleton-circle { border-radius: 50%; }
+
+/* ─── Skeleton layout pieces ──────────────────────────────────────────────────── */
+.sk-logo      { width: 80px; height: 28px; margin-bottom: var(--space-8); }
+.sk-nav-item  { display: flex; align-items: center; gap: var(--space-3); padding: 10px var(--space-3); }
+.sk-nav-icon  { width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0; }
+.sk-nav-label { height: 13px; flex: 1; }
+.sk-progress-bar { height: 6px; border-radius: var(--radius-full); margin-top: var(--space-2); }
+
+.sk-topbar-title { width: 120px; height: 20px; }
+.sk-topbar-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+
+.sk-banner  { height: 100px; border-radius: var(--radius-xl); margin-bottom: var(--space-6); }
+
+.sk-stat    { height: 96px; border-radius: var(--radius-lg); }
+
+.sk-card-tall   { height: 300px; border-radius: var(--radius-lg); margin-bottom: var(--space-5); }
+.sk-card-medium { height: 200px; border-radius: var(--radius-lg); margin-bottom: var(--space-5); }
+
 /* ─── Dashboard Layout ────────────────────────────────────────────────────────── */
 .dashboard {
   display: flex;
@@ -73,7 +131,7 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background var(--transition), color var(--transition);
+  transition: background var(--transition), color var(--transition), transform 0.15s ease;
   width: 100%;
   color: var(--color-text-secondary);
 }
@@ -81,12 +139,18 @@
 .sidebar-nav-item:hover {
   background: var(--color-bg);
   color: var(--color-text);
+  transform: translateX(3px);
 }
 
 .sidebar-nav-item.active {
   background: var(--color-primary-light);
   color: var(--color-primary-dark);
   font-weight: 600;
+}
+
+.sidebar-nav-item.active .sidebar-nav-icon {
+  animation: none;
+  filter: drop-shadow(0 0 2px rgba(27,107,119,0.4));
 }
 
 .sidebar-nav-icon { font-size: 18px; flex-shrink: 0; }
@@ -210,7 +274,10 @@
 .dashboard-content {
   padding: var(--space-8);
   flex: 1;
+  animation: fade-in 0.35s ease both;
 }
+
+.fade-in { animation: fade-in 0.35s ease both; }
 
 /* ─── Welcome Banner ──────────────────────────────────────────────────────────── */
 .welcome-banner {
@@ -222,6 +289,7 @@
   align-items: center;
   margin-bottom: var(--space-6);
   color: white;
+  animation: slide-up-fade 0.45s ease both;
 }
 
 .welcome-text h2 { font-size: 22px; font-weight: 700; color: white; margin-bottom: var(--space-2); }
@@ -263,7 +331,20 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  animation: slide-up-fade 0.4s ease both;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Staggered entrance delays */
+.stats-grid .stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stats-grid .stat-card:nth-child(2) { animation-delay: 0.12s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay: 0.19s; }
+.stats-grid .stat-card:nth-child(4) { animation-delay: 0.26s; }
 
 .stat-icon { font-size: 22px; }
 .stat-value {
@@ -615,8 +696,21 @@
 }
 
 .pathway-card-body {
-  padding: var(--space-6);
-  padding-top: 20px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    max-height 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.28s ease,
+    padding 0.3s ease;
+  padding: 0 var(--space-6);
+  border-top: 0px solid transparent;
+}
+
+.pathway-card-body-open {
+  max-height: 900px;
+  opacity: 1;
+  padding: 20px var(--space-6) var(--space-6);
   border-top: 1px solid var(--color-border-light);
 }
 
