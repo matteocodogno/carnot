@@ -471,7 +471,17 @@ app.get('/api/dashboard', (c) => {
   const user = getAuthUser(c.req.header('Authorization'))
   if (!user) return c.json({ error: 'Non autorizzato' }, 401)
 
-  const q = user.questionnaire
+  // For demo: fall back to a representative default questionnaire so the
+  // dashboard always renders fully even without a completed questionnaire.
+  const DEFAULT_QUESTIONNAIRE: QuestionnaireData = {
+    tipoEdificio: 'unifamiliare',
+    annoCostruzione: '1960_1980',
+    superficie: 'media',
+    riscaldamento: 'gas_olio',
+    classeEnergetica: 'gf',
+    obiettivi: ['bollette', 'co2', 'incentivi'],
+  }
+  const q = user.questionnaire ?? DEFAULT_QUESTIONNAIRE
   let percorsi: Pathway[] = []
   let dossierEdificio = null
 
