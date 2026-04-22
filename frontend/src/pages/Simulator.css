@@ -358,11 +358,14 @@
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  .sim-hero { padding: var(--space-10) var(--space-5) var(--space-8); }
+  .sim-options-3 { grid-template-columns: repeat(2, 1fr); }
   .sim-options-4 { grid-template-columns: repeat(2, 1fr); }
   .sim-options-5 { grid-template-columns: repeat(3, 1fr); }
   .sim-result-cards { grid-template-columns: repeat(2, 1fr); }
   .sim-breakdown { grid-template-columns: 1fr; }
   .sim-cta-inner { flex-direction: column; }
+  .sim-main { padding: var(--space-8) var(--space-5) var(--space-12); }
 }
 
 @media (max-width: 480px) {
@@ -370,4 +373,5 @@
   .sim-options-4 { grid-template-columns: repeat(2, 1fr); }
   .sim-options-5 { grid-template-columns: repeat(2, 1fr); }
   .sim-result-cards { grid-template-columns: 1fr 1fr; }
+  .sim-step-title { font-size: 1.2rem; }
 }

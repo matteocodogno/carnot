@@ -279,6 +279,19 @@
 /* ─── Responsive ──────────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .preview-columns { grid-template-columns: 1fr; }
-  .preview-stats { grid-template-columns: 1fr; }
-  .cta-panel { position: static; }
+  .preview-stats   { grid-template-columns: 1fr; }
+  .cta-panel       { position: static; }
+}
+
+@media (max-width: 600px) {
+  .preview-main { padding: var(--space-6) var(--space-4) var(--space-10); }
+  .preview-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-5);
+  }
+  .preview-stats { grid-template-columns: 1fr 1fr; }
+  .preview-banner-title { font-size: 20px; }
+  .preview-banner-sub   { font-size: 14px; }
 }

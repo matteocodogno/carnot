@@ -44,6 +44,7 @@
   border-radius: var(--radius-md);
   transition: color 0.15s, background 0.15s;
   white-space: nowrap;
+  min-height: 36px;
 }
 
 .public-nav-link:hover {
@@ -64,8 +65,87 @@
   flex-shrink: 0;
 }
 
+/* ─── Hamburger ────────────────────────────────────────────────────────────── */
+.public-nav-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background 0.15s;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.public-nav-hamburger:hover { background: var(--color-bg); }
+
+/* ─── Mobile dropdown menu ─────────────────────────────────────────────────── */
+.public-nav-mobile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  background: white;
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  animation: mobile-menu-in 0.18s ease both;
+}
+
+@keyframes mobile-menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.public-nav-mobile-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-md);
+  text-align: left;
+  width: 100%;
+  transition: color 0.15s, background 0.15s;
+  min-height: 44px;
+}
+
+.public-nav-mobile-link:hover {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.public-nav-mobile-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-2) 0;
+}
+
+.public-nav-mobile-cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.public-nav-mobile-cta .btn,
+.public-nav-mobile-menu > .btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+}
+
+/* ─── Breakpoints ──────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .public-nav-links {
-    display: none;
-  }
+  .public-nav-container { gap: var(--space-3); }
+  .public-nav-links   { display: none; }
+  .public-nav-cta     { display: none; }
+  .public-nav-hamburger { display: flex; }
 }

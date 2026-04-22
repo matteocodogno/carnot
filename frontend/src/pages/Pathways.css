@@ -485,9 +485,7 @@
 }
 
 @media (max-width: 640px) {
-  .pathways-nav .nav-links {
-    display: none;
-  }
+  .pathways-hero { padding: var(--space-10) var(--space-5) var(--space-8); }
 
   .pathways-cards {
     grid-template-columns: 1fr;
@@ -500,4 +498,10 @@
   .pathway-metrics {
     grid-template-columns: 1fr;
   }
+
+  .pathways-cta-inner { padding: var(--space-10) var(--space-5); }
+}
+
+@media (max-width: 400px) {
+  .pathways-stats-inner { grid-template-columns: 1fr; }
 }
