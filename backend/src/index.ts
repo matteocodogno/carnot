@@ -169,11 +169,12 @@ function calculatePathways(q: QuestionnaireData): Pathway[] {
   if (q.area === 'molto_grande') { scores.photovoltaic += 2; scores.isolation += 1 }
   else if (q.area === 'grande') scores.photovoltaic += 1
 
-  if (q.goals.includes('bollette')) { scores.photovoltaic += 2; scores.isolation += 1; scores.heating += 1 }
-  if (q.goals.includes('co2'))      { scores.heating += 2; scores.photovoltaic += 2 }
-  if (q.goals.includes('valore'))   { scores.certification += 3; scores.isolation += 2 }
-  if (q.goals.includes('incentivi')){ scores.heating += 2; scores.isolation += 1 }
-  if (q.goals.includes('comfort'))  { scores.isolation += 2; scores.vmc += 3 }
+  const goals: string[] = Array.isArray(q.goals) ? q.goals : []
+  if (goals.includes('bollette')) { scores.photovoltaic += 2; scores.isolation += 1; scores.heating += 1 }
+  if (goals.includes('co2'))      { scores.heating += 2; scores.photovoltaic += 2 }
+  if (goals.includes('valore'))   { scores.certification += 3; scores.isolation += 2 }
+  if (goals.includes('incentivi')){ scores.heating += 2; scores.isolation += 1 }
+  if (goals.includes('comfort'))  { scores.isolation += 2; scores.vmc += 3 }
 
   const definitions: Pathway[] = [
     {
@@ -404,7 +405,18 @@ app.get('/api/dashboard', async (c) => {
     buildingType: 'unifamiliare', yearBuilt: '1960_1980', area: 'media',
     heating: 'gas_olio', energyClass: 'gf', goals: ['bollette', 'co2', 'incentivi'],
   }
-  const q: QuestionnaireData = user.questionnaireData ?? DEFAULT_Q
+  // Merge stored data with defaults so missing fields never crash downstream
+  const raw = user.questionnaireData ?? {}
+  const q: QuestionnaireData = {
+    buildingType: (raw as QuestionnaireData).buildingType ?? DEFAULT_Q.buildingType,
+    yearBuilt:    (raw as QuestionnaireData).yearBuilt    ?? DEFAULT_Q.yearBuilt,
+    area:         (raw as QuestionnaireData).area         ?? DEFAULT_Q.area,
+    heating:      (raw as QuestionnaireData).heating      ?? DEFAULT_Q.heating,
+    energyClass:  (raw as QuestionnaireData).energyClass  ?? DEFAULT_Q.energyClass,
+    goals: Array.isArray((raw as QuestionnaireData).goals)
+      ? (raw as QuestionnaireData).goals
+      : DEFAULT_Q.goals,
+  }
   const pathways = calculatePathways(q)
   const consultant = getConsultant(user.consultantId)
 
@@ -552,7 +564,17 @@ app.get('/api/pathway/:pathwayId', async (c) => {
     buildingType: 'unifamiliare', yearBuilt: '1960_1980', area: 'media',
     heating: 'gas_olio', energyClass: 'gf', goals: ['bollette', 'co2', 'incentivi'],
   }
-  const q = user.questionnaireData ?? DEFAULT_Q
+  const raw2 = user.questionnaireData ?? {}
+  const q: QuestionnaireData = {
+    buildingType: (raw2 as QuestionnaireData).buildingType ?? DEFAULT_Q.buildingType,
+    yearBuilt:    (raw2 as QuestionnaireData).yearBuilt    ?? DEFAULT_Q.yearBuilt,
+    area:         (raw2 as QuestionnaireData).area         ?? DEFAULT_Q.area,
+    heating:      (raw2 as QuestionnaireData).heating      ?? DEFAULT_Q.heating,
+    energyClass:  (raw2 as QuestionnaireData).energyClass  ?? DEFAULT_Q.energyClass,
+    goals: Array.isArray((raw2 as QuestionnaireData).goals)
+      ? (raw2 as QuestionnaireData).goals
+      : DEFAULT_Q.goals,
+  }
   const pathways = calculatePathways(q)
   const pathway = pathways.find((p) => p.id === c.req.param('pathwayId'))
   if (!pathway) return c.json({ error: 'Percorso non trovato' }, 404)
