@@ -185,7 +185,7 @@ function UserPanel({ user, consultants, onUpdate, onClose }: {
               <span>Anno</span><strong>{YEAR_LABELS[user.questionnaire.yearBuilt] ?? '-'}</strong>
               <span>Riscaldamento</span><strong>{HEATING_LABELS[user.questionnaire.heating] ?? '-'}</strong>
               <span>Classe CECE</span><strong>{ENERGY_LABELS[user.questionnaire.energyClass] ?? '-'}</strong>
-              <span>Obiettivi</span><strong>{user.questionnaire.goals.join(', ')}</strong>
+              <span>Obiettivi</span><strong>{(user.questionnaire.goals ?? []).join(', ')}</strong>
             </div>
           </div>
         )}
