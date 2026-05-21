@@ -5,8 +5,11 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const sql = postgres(process.env.DATABASE_URL, {
-  // On Railway, SSL is required; locally it can be disabled
-  ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
+  // On Railway (Postgres 18 with self-signed cert), use the TLS object form.
+  // - rejectUnauthorized: false accepts Railway's self-signed certificate.
+  // - This also avoids the "direct SSL connection without ALPN" log that PG18
+  //   emits when clients use the older SSLRequest handshake (ssl: 'require').
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   // Auto-convert snake_case columns to camelCase in result objects
   transform: postgres.camel,
   max: 10,
